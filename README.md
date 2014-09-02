@@ -8,6 +8,22 @@ There are 3 basic component areas:
  * Microcontroller code (Arduino code)
  * Plastic handle (Inventor IPT files and STL files for 3D printing)
 
+## Discussion Forum
+
+http://ost.io/@jmkao/rfglow
+
+## Status
+This project is still quite a ways from being finished. All of the areas are sufficiently functional to demonstrate a proof of concept, but requires more work before a working device could actually be used in a physically demanding environment.
+
+The primary items that need work are:
+ * Handle design - complete an actual printable and usable handle
+ * RF Master - Integrate a 0.96" color OLED screen, then design a PCB for it
+ * RF Slave - Update PCB to put power switch in a more sane location and have at least 1 button for local control
+
+Then there are other interesting things that one could do with a microcontroller:
+ * Fade commands
+ * Color cycling commands
+
 # Electronics
 The PCB design is in the eagle folder and contains the schematic, PCB layout, and a set of gerber files (zipped together) for sending to a PCB fabrication service like Osh Park or Seeedstudio. (I had my first set made at Osh Park.)
 
