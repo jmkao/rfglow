@@ -24,7 +24,7 @@ Then there are other interesting things that one could do with a microcontroller
  * Fade commands
  * Color cycling commands
 
-I am open to contributions in all areas.
+Contributions welcome in all areas.
 
 # Electronics
 The PCB design is in the eagle folder and contains the schematic, PCB layout, and a set of gerber files (zipped together) for sending to a PCB fabrication service like Osh Park or Seeedstudio. (I had my first set made at Osh Park.)
