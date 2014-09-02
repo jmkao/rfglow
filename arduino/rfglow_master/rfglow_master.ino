@@ -1,0 +1,213 @@
+#include <ClickButton.h>
+
+#include "EEPROM.h"
+#include "cc1101.h"
+#include "WString.h"
+
+// CC1101 Setup
+byte networkAddress[] = {39,0};
+byte senderAddress = 4;
+byte receiverAddress = 5;
+byte syncWord[] = {39,39};
+
+#define RFCHANNEL 2
+
+CC1101 cc1101;
+
+// Repeat the send of commands this many times
+#define COMMAND_REPEAT 2
+
+ClickButton left(6, LOW, CLICKBTN_PULLUP);
+ClickButton middle(5, LOW, CLICKBTN_PULLUP);
+ClickButton right(4, LOW, CLICKBTN_PULLUP);
+
+void setup()
+{
+  Serial.begin(38400);
+  Serial.println("start");
+
+  left.debounceTime   = 20;   // Debounce timer in ms
+  left.multiclickTime = 50;  // Time limit for multi clicks
+  left.longClickTime  = 1000; // time until "held-down clicks" register
+
+  middle.debounceTime   = 20;   // Debounce timer in ms
+  middle.multiclickTime = 50;  // Time limit for multi clicks
+  middle.longClickTime  = 1000; // time until "held-down clicks" register
+
+  right.debounceTime   = 20;   // Debounce timer in ms
+  right.multiclickTime = 50;  // Time limit for multi clicks
+  right.longClickTime  = 1000; // time until "held-down clicks" register
+
+
+  // initialize the RF Chip
+  cc1101.init();
+  cc1101.setCarrierFreq(CFREQ_868);
+
+ cc1101.writeReg(CC1101_PKTLEN,0x10);  //Packet Length
+//  cc1101.writeReg(CC1101_PKTCTRL1,0x04);//Packet Automation Control
+  cc1101.writeReg(CC1101_PKTCTRL0,0x45);//Packet Automation Control
+//  cc1101.writeReg(CC1101_ADDR,0x00);    //Device Address
+//  cc1101.writeReg(CC1101_CHANNR,0x00);  //Channel Number
+//  cc1101.writeReg(CC1101_FSCTRL1,0x06); //Frequency Synthesizer Control
+//  cc1101.writeReg(CC1101_FSCTRL0,0x00); //Frequency Synthesizer Control
+//  cc1101.writeReg(CC1101_FREQ2,0x21);   //Frequency Control Word, High Byte
+  cc1101.writeReg(CC1101_FREQ1,0x80);   //Frequency Control Word, Middle Byte
+  cc1101.writeReg(CC1101_FREQ0,0x00);   //Frequency Control Word, Low Byte
+  cc1101.writeReg(CC1101_MDMCFG4,0xC7); //Modem Configuration
+  cc1101.writeReg(CC1101_MDMCFG3,0x02); //Modem Configuration
+  cc1101.writeReg(CC1101_MDMCFG2,0x13); //Modem Configuration
+  cc1101.writeReg(CC1101_MDMCFG1,0x80); //Modem Configuration
+//  cc1101.writeReg(CC1101_MDMCFG0,0xF8); //Modem Configuration
+//  cc1101.writeReg(CC1101_DEVIATN,0x34); //Modem Deviation Setting
+//  cc1101.writeReg(CC1101_MCSM2,0x07);   //Main Radio Control State Machine Configuration
+//  cc1101.writeReg(CC1101_MCSM1,0x30);   //Main Radio Control State Machine Configuration
+//  cc1101.writeReg(CC1101_MCSM0,0x18);   //Main Radio Control State Machine Configuration
+//  cc1101.writeReg(CC1101_FOCCFG,0x16);  //Frequency Offset Compensation Configuration
+//  cc1101.writeReg(CC1101_BSCFG,0x6C);   //Bit Synchronization Configuration
+//  cc1101.writeReg(CC1101_AGCCTRL2,0x43);//AGC Control
+//  cc1101.writeReg(CC1101_AGCCTRL1,0x40);//AGC Control
+//  cc1101.writeReg(CC1101_AGCCTRL0,0x91);//AGC Control
+//  cc1101.writeReg(CC1101_WOREVT1,0x87); //High Byte Event0 Timeout
+//  cc1101.writeReg(CC1101_WOREVT0,0x6B); //Low Byte Event0 Timeout
+//  cc1101.writeReg(CC1101_WORCTRL,0xFB); //Wake On Radio Control
+//  cc1101.writeReg(CC1101_FREND1,0x56);  //Front End RX Configuration
+//  cc1101.writeReg(CC1101_FREND0,0x10);  //Front End TX Configuration
+//  cc1101.writeReg(CC1101_FSCAL3,0xE9);  //Frequency Synthesizer Calibration
+//  cc1101.writeReg(CC1101_FSCAL2,0x2A);  //Frequency Synthesizer Calibration
+//  cc1101.writeReg(CC1101_FSCAL1,0x00);  //Frequency Synthesizer Calibration
+//  cc1101.writeReg(CC1101_FSCAL0,0x1F);  //Frequency Synthesizer Calibration
+//  cc1101.writeReg(CC1101_RCCTRL1,0x41); //RC Oscillator Configuration
+//  cc1101.writeReg(CC1101_RCCTRL0,0x00); //RC Oscillator Configuration
+//  cc1101.writeReg(CC1101_FSTEST,0x59);  //Frequency Synthesizer Calibration Control
+
+  cc1101.setTxPowerAmp(PA_LongDistance);
+
+  cc1101.setChannel(RFCHANNEL, true);
+  cc1101.setSyncWord(syncWord, true);
+
+  cc1101.setDevAddress(senderAddress, true);
+
+  Serial.println("device initialized");
+
+  Serial.print("Sender address = ");
+  Serial.println(senderAddress);
+  Serial.print("Receiver address = ");
+  Serial.println(receiverAddress);
+
+}
+
+
+/*
+char inData[80];
+byte index = 0;
+*/
+
+// autocycle interval
+#define INTERVAL 1000
+
+unsigned long previousMs = 0;
+int ledHue = 0;
+boolean isAutoCycle = false;
+
+void loop() {
+  
+  unsigned long currentMs = millis();
+  
+  left.Update();
+  middle.Update();
+  right.Update();
+  
+  if (left.clicks == 1) {
+    Serial.println("Left button pressed.");
+    if (ledHue < 60) {
+      ledHue = ledHue - 60 + 360;
+    } else {
+      ledHue -= 60;
+    }
+    sendCommand(ledHue, 255, 64);
+  }
+  
+  if (middle.clicks == 1) {
+    Serial.println("Middle button pressed.");
+    isAutoCycle = !isAutoCycle;
+  }
+  
+  if (right.clicks == 1) {
+    Serial.println("Right button pressed.");
+    ledHue = (ledHue+60)%360;
+    sendCommand(ledHue, 255, 64);
+  }
+  
+  if (isAutoCycle) {
+    if (currentMs - previousMs > INTERVAL) {
+      ledHue = (ledHue+60)%360;
+      sendCommand(ledHue, 255, 64);
+      previousMs = currentMs;
+    }
+  } else {
+    previousMs = currentMs;
+  }
+  
+  /*
+  while (Serial.available() > 0) {
+    char aChar = Serial.read();
+    if (aChar == '\n') {
+      // Turn inData into a \0 terminated string
+      inData[index] = 0;
+
+      Serial.print("Confirmed ");
+      Serial.print(inData);
+      Serial.print(". "); 
+      
+      // Parse the line
+      int hue, saturation, brightness;
+      int numExtracted = sscanf(inData,"%u %u %u",&hue,&saturation,&brightness);
+      Serial.print(" # values = ");
+      Serial.println(numExtracted);
+      if (numExtracted == 3) {
+        sendCommand(hue, saturation, brightness);
+      }
+      
+      // Reset index
+      index = 0;
+      Serial.println("ready, enter 3 space separated numbers like 30 30 30 for HSV:");
+    } else {
+      inData[index] = aChar;
+      index++;
+    }
+  }
+  */
+}
+
+void sendCommand(unsigned int hue, unsigned int saturation, unsigned int brightness) {
+  CCPACKET packet;
+
+  packet.length = 7;
+  packet.data[0] = receiverAddress;
+
+  packet.data[1] = (hue >> 8) & 0xFF;
+  packet.data[2] = hue & 0xFF;
+  packet.data[3] = (saturation >> 8) & 0xFF;
+  packet.data[4] = saturation & 0xFF;
+  packet.data[5] = (brightness >> 8) & 0xFF;
+  packet.data[6] = brightness & 0xFF;
+  
+  Serial.print("Hue: ");
+  Serial.println(hue);
+  
+  /*
+  Serial.println(packet.length);
+  for (int i = 0; i < packet.length; i++) {
+    Serial.println(packet.data[i]);
+  }
+  */
+ 
+  for (int i=0; i<COMMAND_REPEAT; i++) {
+    if(cc1101.sendData(packet)){
+      Serial.print("ok ");
+    } else {
+      Serial.print("failed ");
+    }
+  }
+}
+
