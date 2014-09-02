@@ -1,7 +1,7 @@
 rfglow
 ======
 
-All the parts for an RF controlled RGB glow stick, in the style of a Ruifan KING BLADE (キングブレード). In fact, making this work requires a diffuser from a KB since the diffuser itself cannot be 3D printed.
+All the parts for an RF controlled RGB glow stick, in the style of a Ruifan KING BLADE (キングブレード http://ruifan.co.jp/pro_kb_x.html). In fact, making this work requires a diffuser from a KB since the diffuser itself cannot be 3D printed.
 
 There are 3 basic component areas:
  * Electronics (Eagle files and BOM)
