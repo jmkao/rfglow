@@ -23,6 +23,7 @@ The primary items that need work are:
 Then there are other interesting things that one could do with a microcontroller:
  * Fade commands
  * Color cycling commands
+ * Slaves also act as command repeaters
 
 Contributions welcome in all areas.
 
@@ -59,6 +60,13 @@ Arudino Code for 1.0.x.
  * rfglow_serial
   * Code for when the master is connected to a computer, in which case you can enter the hue, saturation, and brightness as tuples over the serial line to send the command.
   * This code hasn't been touched in a while, and needs to have the radio settings from rfglow_master copied into it for it to actually work with the current version of rfglow_slave
+
+The Arduino code depends on the following libraries:
+ * ShiftPWM from https://github.com/elcojacobs/ShiftPWM
+ * Panstamp for Arudino 1.0.x, currently panstamp_library.zip from http://www.panstamp.com/downloads
+  * Uses only the CC1101 libraries and not the SWAP stack
+ * ClickButton from https://code.google.com/p/clickbutton/downloads/list
+  * Only needed by rfglow_master currently for the button behavior
 
 # Plastic Handle
 
