@@ -86,7 +86,12 @@ byte index = 0;
 #define INTERVAL 1000
 
 unsigned long previousMs = 0;
+
 int ledHue = 0;
+unsigned char ledBrightnessLevels[] = { 64, 128, 192, 240 };
+unsigned char NUM_BRIGHT_LEVELS = sizeof(ledBrightnessLevels);
+unsigned char currentBrightnessIndex = 0;
+
 boolean isAutoCycle = false;
 boolean isOff = false;
 
@@ -106,7 +111,7 @@ void loop() {
       ledHue -= 60;
     }
     if (!isOff) {
-      sendCommand(ledHue, 255, 64);
+      sendCurrentColor();
     }
   }
   
@@ -121,11 +126,12 @@ void loop() {
     Serial.println("Right button pressed.");
     ledHue = (ledHue+60)%360;
     if (!isOff) {
-      sendCommand(ledHue, 255, 64);
+      sendCurrentColor();
     }
   }
   
   // Negative clicks means long click
+  // Middle button long press means toggle on/off
   if (middle.clicks < 0) {
     Serial.println("Middle button long press");
     isAutoCycle = false;
@@ -133,14 +139,36 @@ void loop() {
     if (isOff) {
       sendCommand(0, 0, 0);
     } else {
-      sendCommand(ledHue, 255, 64);
+      sendCurrentColor();
     }
+  }
+  
+  // Left button long press means decrement brightness level
+  if (left.clicks < 0) {
+    Serial.println("Left button long press");
+    if (currentBrightnessIndex < 1) {
+      currentBrightnessIndex = 0;
+    } else {
+      currentBrightnessIndex--;
+    }
+    sendCurrentColor();
+  }
+  
+  // Right button long press means increment brightness level
+  if (right.clicks < 0) {
+    Serial.println("Right button long press");
+    if (currentBrightnessIndex >= (NUM_BRIGHT_LEVELS-1)) {
+      currentBrightnessIndex = NUM_BRIGHT_LEVELS -1;
+    } else {
+      currentBrightnessIndex++;
+    }
+    sendCurrentColor();
   }
   
   if (isAutoCycle) {
     if (currentMs - previousMs > INTERVAL) {
       ledHue = (ledHue+60)%360;
-      sendCommand(ledHue, 255, 64);
+      sendCurrentColor();
       previousMs = currentMs;
     }
   } else {
@@ -176,6 +204,14 @@ void loop() {
     }
   }
   */
+}
+
+void sendHueChange(unsigned int hue) {
+  sendCommand(hue, 255, ledBrightnessLevels[currentBrightnessIndex]);
+}
+
+void sendCurrentColor() {
+  sendCommand(ledHue, 255, ledBrightnessLevels[currentBrightnessIndex]);
 }
 
 void sendCommand(unsigned int hue, unsigned int saturation, unsigned int brightness) {
