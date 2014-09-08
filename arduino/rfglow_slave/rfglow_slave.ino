@@ -13,8 +13,8 @@ const bool ShiftPWM_invertOutputs = false;
 const bool ShiftPWM_balanceLoad = false;
 #include <ShiftPWM.h>
 
-unsigned char maxBrightness = 64;
-unsigned char pwmFrequency = 230;
+unsigned char maxBrightness = 16;
+unsigned int pwmFrequency = 1200;
 int numRegisters = 1;
 
 // CC1101 Setup
@@ -34,7 +34,7 @@ void cc1101Interrupt(void) {
   CCPACKET packet;
     
   detachInterrupt(0);
-    
+        
   if(cc1101.receiveData(&packet) > 0) {
     if (packet.crc_ok && packet.length > 1) {
       processData(packet.data);
@@ -53,6 +53,8 @@ void cc1101Interrupt(void) {
  */
 void setup()
 {
+  Serial.begin(38400);
+  Serial.println("Setup started");
   // Init panStamp
   //panstamp.init();
 
@@ -79,26 +81,7 @@ void setup()
   cc1101.writeReg(CC1101_MDMCFG1,0x80); //Modem Configuration
 //  cc1101.writeReg(CC1101_MDMCFG0,0xF8); //Modem Configuration
 //  cc1101.writeReg(CC1101_DEVIATN,0x34); //Modem Deviation Setting
-//  cc1101.writeReg(CC1101_MCSM2,0x07);   //Main Radio Control State Machine Configuration
-//  cc1101.writeReg(CC1101_MCSM1,0x30);   //Main Radio Control State Machine Configuration
-//  cc1101.writeReg(CC1101_MCSM0,0x18);   //Main Radio Control State Machine Configuration
-//  cc1101.writeReg(CC1101_FOCCFG,0x16);  //Frequency Offset Compensation Configuration
-//  cc1101.writeReg(CC1101_BSCFG,0x6C);   //Bit Synchronization Configuration
-//  cc1101.writeReg(CC1101_AGCCTRL2,0x43);//AGC Control
-//  cc1101.writeReg(CC1101_AGCCTRL1,0x40);//AGC Control
-//  cc1101.writeReg(CC1101_AGCCTRL0,0x91);//AGC Control
-//  cc1101.writeReg(CC1101_WOREVT1,0x87); //High Byte Event0 Timeout
-//  cc1101.writeReg(CC1101_WOREVT0,0x6B); //Low Byte Event0 Timeout
-//  cc1101.writeReg(CC1101_WORCTRL,0xFB); //Wake On Radio Control
-//  cc1101.writeReg(CC1101_FREND1,0x56);  //Front End RX Configuration
-//  cc1101.writeReg(CC1101_FREND0,0x10);  //Front End TX Configuration
-//  cc1101.writeReg(CC1101_FSCAL3,0xE9);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_FSCAL2,0x2A);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_FSCAL1,0x00);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_FSCAL0,0x1F);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_RCCTRL1,0x41); //RC Oscillator Configuration
-//  cc1101.writeReg(CC1101_RCCTRL0,0x00); //RC Oscillator Configuration
-//  cc1101.writeReg(CC1101_FSTEST,0x59);  //Frequency Synthesizer Calibration Control
+
 
   cc1101.setChannel(RFCHANNEL, true);
   cc1101.setSyncWord(syncWord, false);
@@ -114,6 +97,10 @@ void setup()
   ShiftPWM.Start(pwmFrequency, maxBrightness);
   //ShiftPWM.SetAll(0);
   ShiftPWM.OneByOneFast();
+  ShiftPWM.PrintInterruptLoad();
+  Serial.println(ShiftPWM.m_ledFrequency);
+  Serial.println(ShiftPWM.m_maxBrightness);
+  Serial.println("Setup complete");
 }
 
 /**

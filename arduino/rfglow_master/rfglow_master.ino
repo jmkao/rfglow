@@ -59,26 +59,6 @@ void setup()
   cc1101.writeReg(CC1101_MDMCFG1,0x80); //Modem Configuration
 //  cc1101.writeReg(CC1101_MDMCFG0,0xF8); //Modem Configuration
 //  cc1101.writeReg(CC1101_DEVIATN,0x34); //Modem Deviation Setting
-//  cc1101.writeReg(CC1101_MCSM2,0x07);   //Main Radio Control State Machine Configuration
-//  cc1101.writeReg(CC1101_MCSM1,0x30);   //Main Radio Control State Machine Configuration
-//  cc1101.writeReg(CC1101_MCSM0,0x18);   //Main Radio Control State Machine Configuration
-//  cc1101.writeReg(CC1101_FOCCFG,0x16);  //Frequency Offset Compensation Configuration
-//  cc1101.writeReg(CC1101_BSCFG,0x6C);   //Bit Synchronization Configuration
-//  cc1101.writeReg(CC1101_AGCCTRL2,0x43);//AGC Control
-//  cc1101.writeReg(CC1101_AGCCTRL1,0x40);//AGC Control
-//  cc1101.writeReg(CC1101_AGCCTRL0,0x91);//AGC Control
-//  cc1101.writeReg(CC1101_WOREVT1,0x87); //High Byte Event0 Timeout
-//  cc1101.writeReg(CC1101_WOREVT0,0x6B); //Low Byte Event0 Timeout
-//  cc1101.writeReg(CC1101_WORCTRL,0xFB); //Wake On Radio Control
-//  cc1101.writeReg(CC1101_FREND1,0x56);  //Front End RX Configuration
-//  cc1101.writeReg(CC1101_FREND0,0x10);  //Front End TX Configuration
-//  cc1101.writeReg(CC1101_FSCAL3,0xE9);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_FSCAL2,0x2A);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_FSCAL1,0x00);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_FSCAL0,0x1F);  //Frequency Synthesizer Calibration
-//  cc1101.writeReg(CC1101_RCCTRL1,0x41); //RC Oscillator Configuration
-//  cc1101.writeReg(CC1101_RCCTRL0,0x00); //RC Oscillator Configuration
-//  cc1101.writeReg(CC1101_FSTEST,0x59);  //Frequency Synthesizer Calibration Control
 
   cc1101.setTxPowerAmp(PA_LongDistance);
 
@@ -108,6 +88,7 @@ byte index = 0;
 unsigned long previousMs = 0;
 int ledHue = 0;
 boolean isAutoCycle = false;
+boolean isOff = false;
 
 void loop() {
   
@@ -124,18 +105,36 @@ void loop() {
     } else {
       ledHue -= 60;
     }
-    sendCommand(ledHue, 255, 64);
+    if (!isOff) {
+      sendCommand(ledHue, 255, 64);
+    }
   }
   
   if (middle.clicks == 1) {
     Serial.println("Middle button pressed.");
-    isAutoCycle = !isAutoCycle;
+    if (!isOff) {
+      isAutoCycle = !isAutoCycle;
+    }
   }
   
   if (right.clicks == 1) {
     Serial.println("Right button pressed.");
     ledHue = (ledHue+60)%360;
-    sendCommand(ledHue, 255, 64);
+    if (!isOff) {
+      sendCommand(ledHue, 255, 64);
+    }
+  }
+  
+  // Negative clicks means long click
+  if (middle.clicks < 0) {
+    Serial.println("Middle button long press");
+    isAutoCycle = false;
+    isOff = !isOff;
+    if (isOff) {
+      sendCommand(0, 0, 0);
+    } else {
+      sendCommand(ledHue, 255, 64);
+    }
   }
   
   if (isAutoCycle) {
