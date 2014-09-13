@@ -1,3 +1,25 @@
+#define power_adc_enable()      (PRR &= (uint8_t)~(1 << PRADC))
+#define power_adc_disable()     (PRR |= (uint8_t)(1 << PRADC))
+
+#define power_spi_enable()      (PRR &= (uint8_t)~(1 << PRSPI))
+#define power_spi_disable()     (PRR |= (uint8_t)(1 << PRSPI))
+
+#define power_usart0_enable()   (PRR &= (uint8_t)~(1 << PRUSART0))
+#define power_usart0_disable()  (PRR |= (uint8_t)(1 << PRUSART0))
+
+#define power_timer0_enable()   (PRR &= (uint8_t)~(1 << PRTIM0))
+#define power_timer0_disable()  (PRR |= (uint8_t)(1 << PRTIM0))
+
+#define power_timer1_enable()   (PRR &= (uint8_t)~(1 << PRTIM1))
+#define power_timer1_disable()  (PRR |= (uint8_t)(1 << PRTIM1))
+
+#define power_timer2_enable()   (PRR &= (uint8_t)~(1 << PRTIM2))
+#define power_timer2_disable()  (PRR |= (uint8_t)(1 << PRTIM2))
+
+#define power_twi_enable()      (PRR &= (uint8_t)~(1 << PRTWI))
+#define power_twi_disable()     (PRR |= (uint8_t)(1 << PRTWI))
+
+
 #include <EEPROM.h>
 #include "cc1101.h"
 //#include "regtable.h"
@@ -53,13 +75,11 @@ void cc1101Interrupt(void) {
  */
 void setup()
 {
+  
+  power_adc_disable();
+  
   Serial.begin(38400);
   Serial.println("Setup started");
-  // Init panStamp
-  //panstamp.init();
-
-  // Transmit product code
-  //getRegister(REGI_PRODUCTCODE)->getData();
 
   // Init CC1101
   cc1101.init();
@@ -84,7 +104,7 @@ void setup()
 
 
   cc1101.setChannel(RFCHANNEL, true);
-  cc1101.setSyncWord(syncWord, false);
+  cc1101.setSyncWord(syncWord, true);
   
   cc1101.setDevAddress(receiverAddress, false);
   cc1101.disableAddressCheck();
@@ -95,12 +115,13 @@ void setup()
   ShiftPWM.SetAmountOfRegisters(numRegisters);
   ShiftPWM.SetPinGrouping(1);
   ShiftPWM.Start(pwmFrequency, maxBrightness);
-  //ShiftPWM.SetAll(0);
+  ShiftPWM.SetAll(0);
   ShiftPWM.OneByOneFast();
-  ShiftPWM.PrintInterruptLoad();
+  //ShiftPWM.PrintInterruptLoad();
   Serial.println(ShiftPWM.m_ledFrequency);
   Serial.println(ShiftPWM.m_maxBrightness);
   Serial.println("Setup complete");
+  
 }
 
 /**
