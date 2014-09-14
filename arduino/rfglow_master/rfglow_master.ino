@@ -174,36 +174,6 @@ void loop() {
   } else {
     previousMs = currentMs;
   }
-  
-  /*
-  while (Serial.available() > 0) {
-    char aChar = Serial.read();
-    if (aChar == '\n') {
-      // Turn inData into a \0 terminated string
-      inData[index] = 0;
-
-      Serial.print("Confirmed ");
-      Serial.print(inData);
-      Serial.print(". "); 
-      
-      // Parse the line
-      int hue, saturation, brightness;
-      int numExtracted = sscanf(inData,"%u %u %u",&hue,&saturation,&brightness);
-      Serial.print(" # values = ");
-      Serial.println(numExtracted);
-      if (numExtracted == 3) {
-        sendCommand(hue, saturation, brightness);
-      }
-      
-      // Reset index
-      index = 0;
-      Serial.println("ready, enter 3 space separated numbers like 30 30 30 for HSV:");
-    } else {
-      inData[index] = aChar;
-      index++;
-    }
-  }
-  */
 }
 
 void sendHueChange(unsigned int hue) {
