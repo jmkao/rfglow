@@ -23,7 +23,6 @@
 #include <EEPROM.h>
 #include "cc1101.h"
 //#include "regtable.h"
-//#include "panstamp.h"
 
 // ShiftPWM Setup
 #define SHIFTPWM_NOSPI
@@ -56,7 +55,7 @@ void cc1101Interrupt(void) {
   CCPACKET packet;
     
   detachInterrupt(0);
-        
+            
   if(cc1101.receiveData(&packet) > 0) {
     if (packet.crc_ok && packet.length > 1) {
       processData(packet.data);
@@ -106,7 +105,7 @@ void setup()
   cc1101.setChannel(RFCHANNEL, true);
   cc1101.setSyncWord(syncWord, true);
   
-  cc1101.setDevAddress(receiverAddress, false);
+  cc1101.setDevAddress(receiverAddress, true);
   cc1101.disableAddressCheck();
   cc1101.setRxState();
   
@@ -157,7 +156,8 @@ void processData(byte *data) {
 
   hue = ((data[1] << 8) + data[2]);
   saturation = ((data[3] << 8) + data[4]);
-  brightness = ((data[5] << 8) + data[6]);  
+  brightness = ((data[5] << 8) + data[6]);
   
+  Serial.println("Process Data");
   ShiftPWM.SetHSV(0, hue, saturation, brightness);
 }
