@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.5.0">
+<eagle version="7.1.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -161,26 +161,26 @@ asseymbly: horizontal, top view: component's side&lt;/p&gt;</description>
 <text x="3.81" y="-6.985" size="1.016" layer="21" rot="R90" align="center-left">S</text>
 </package>
 <package name="RFBEE">
-<pad name="P$1" x="-11" y="8" drill="0.8"/>
-<pad name="P$2" x="-11" y="6" drill="0.8"/>
-<pad name="P$3" x="-11" y="4" drill="0.8"/>
-<pad name="P$4" x="-11" y="2" drill="0.8"/>
-<pad name="P$5" x="-11" y="0" drill="0.8"/>
-<pad name="P$6" x="-11" y="-2" drill="0.8"/>
-<pad name="P$7" x="-11" y="-4" drill="0.8"/>
-<pad name="P$8" x="-11" y="-6" drill="0.8"/>
-<pad name="P$9" x="-11" y="-8" drill="0.8"/>
-<pad name="P$10" x="-11" y="-10" drill="0.8"/>
-<pad name="P$11" x="11" y="8" drill="0.8"/>
-<pad name="P$12" x="11" y="6" drill="0.8"/>
-<pad name="P$13" x="11" y="4" drill="0.8"/>
-<pad name="P$14" x="11" y="2" drill="0.8"/>
-<pad name="P$15" x="11" y="0" drill="0.8"/>
-<pad name="P$16" x="11" y="-2" drill="0.8"/>
-<pad name="P$17" x="11" y="-4" drill="0.8"/>
-<pad name="P$18" x="11" y="-6" drill="0.8"/>
-<pad name="P$19" x="11" y="-8" drill="0.8"/>
-<pad name="P$20" x="11" y="-10" drill="0.8"/>
+<pad name="P$1" x="-11" y="8" drill="0.8" diameter="1.524"/>
+<pad name="P$2" x="-11" y="6" drill="0.8" diameter="1.524"/>
+<pad name="P$3" x="-11" y="4" drill="0.8" diameter="1.524"/>
+<pad name="P$4" x="-11" y="2" drill="0.8" diameter="1.524"/>
+<pad name="P$5" x="-11" y="0" drill="0.8" diameter="1.524"/>
+<pad name="P$6" x="-11" y="-2" drill="0.8" diameter="1.524"/>
+<pad name="P$7" x="-11" y="-4" drill="0.8" diameter="1.524"/>
+<pad name="P$8" x="-11" y="-6" drill="0.8" diameter="1.524"/>
+<pad name="P$9" x="-11" y="-8" drill="0.8" diameter="1.524"/>
+<pad name="P$10" x="-11" y="-10" drill="0.8" diameter="1.524"/>
+<pad name="P$11" x="11" y="8" drill="0.8" diameter="1.524"/>
+<pad name="P$12" x="11" y="6" drill="0.8" diameter="1.524"/>
+<pad name="P$13" x="11" y="4" drill="0.8" diameter="1.524"/>
+<pad name="P$14" x="11" y="2" drill="0.8" diameter="1.524"/>
+<pad name="P$15" x="11" y="0" drill="0.8" diameter="1.524"/>
+<pad name="P$16" x="11" y="-2" drill="0.8" diameter="1.524"/>
+<pad name="P$17" x="11" y="-4" drill="0.8" diameter="1.524"/>
+<pad name="P$18" x="11" y="-6" drill="0.8" diameter="1.524"/>
+<pad name="P$19" x="11" y="-8" drill="0.8" diameter="1.524"/>
+<pad name="P$20" x="11" y="-10" drill="0.8" diameter="1.524"/>
 <wire x1="-12.3" y1="8.6" x2="-12.3" y2="-16" width="0.127" layer="21"/>
 <wire x1="12.3" y1="8.6" x2="12.3" y2="-16" width="0.127" layer="21"/>
 <wire x1="-12.3" y1="-16" x2="12.3" y2="-16" width="0.127" layer="21"/>
@@ -233,10 +233,10 @@ asseymbly: horizontal, top view: component's side&lt;/p&gt;</description>
 <wire x1="-2.8" y1="7.4" x2="2.8" y2="7.4" width="0.254" layer="21"/>
 <wire x1="2.8" y1="7.4" x2="2.8" y2="8.4" width="0.254" layer="21"/>
 <wire x1="2.8" y1="8.4" x2="5" y2="8.4" width="0.254" layer="21"/>
-<pad name="YELLOW" x="-3" y="0" drill="0.8" diameter="1.27" shape="square"/>
-<pad name="WHITE" x="-1" y="0" drill="0.8" diameter="1.27"/>
-<pad name="RED" x="1" y="0" drill="0.8" diameter="1.27"/>
-<pad name="BLACK" x="3" y="0" drill="0.8" diameter="1.27"/>
+<pad name="YELLOW" x="-3" y="0" drill="0.8" diameter="1.524" shape="square"/>
+<pad name="WHITE" x="-1" y="0" drill="0.8" diameter="1.524"/>
+<pad name="RED" x="1" y="0" drill="0.8" diameter="1.524"/>
+<pad name="BLACK" x="3" y="0" drill="0.8" diameter="1.524"/>
 <text x="-1.889" y="7.668" size="0.889" layer="25" font="vector" ratio="11">&gt;NAME</text>
 <text x="-1.905" y="6.35" size="0.635" layer="27" font="vector" ratio="10">&gt;VALUE</text>
 <text x="-2.54" y="1.905" size="1.016" layer="21" rot="R90">Yellow</text>
@@ -476,14 +476,14 @@ THT; 4-pin (0.1"); 0.4"x0.6"&lt;/pre&gt;
 <wire x1="0" y1="22.86" x2="101.6" y2="22.86" width="0.1016" layer="94"/>
 <wire x1="0" y1="22.86" x2="0" y2="35.56" width="0.1016" layer="94"/>
 <wire x1="101.6" y1="22.86" x2="101.6" y2="15.24" width="0.1016" layer="94"/>
-<text x="1.27" y="1.27" size="2.54" layer="94" font="vector">Date:</text>
-<text x="12.7" y="1.27" size="2.54" layer="94" font="vector">&gt;LAST_DATE_TIME</text>
-<text x="72.39" y="1.27" size="2.54" layer="94" font="vector">Sheet:</text>
-<text x="86.36" y="1.27" size="2.54" layer="94" font="vector">&gt;SHEET</text>
-<text x="88.9" y="11.43" size="2.54" layer="94" font="vector">REV:</text>
-<text x="1.27" y="19.05" size="2.54" layer="94" font="vector">TITLE:</text>
-<text x="1.27" y="11.43" size="2.54" layer="94" font="vector">Document Number:</text>
-<text x="17.78" y="19.05" size="2.54" layer="94" font="vector">&gt;DRAWING_NAME</text>
+<text x="1.27" y="1.27" size="2.54" layer="94">Date:</text>
+<text x="12.7" y="1.27" size="2.54" layer="94">&gt;LAST_DATE_TIME</text>
+<text x="72.39" y="1.27" size="2.54" layer="94">Sheet:</text>
+<text x="86.36" y="1.27" size="2.54" layer="94">&gt;SHEET</text>
+<text x="88.9" y="11.43" size="2.54" layer="94">REV:</text>
+<text x="1.27" y="19.05" size="2.54" layer="94">TITLE:</text>
+<text x="1.27" y="11.43" size="2.54" layer="94">Document Number:</text>
+<text x="17.78" y="19.05" size="2.54" layer="94">&gt;DRAWING_NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -557,7 +557,7 @@ Source: http://www2.produktinfo.conrad.com/datenblaetter/700000-724999/705152-da
 <pad name="1" x="-2.54" y="0" drill="1.1" diameter="1.4224" shape="long" rot="R90"/>
 <pad name="2" x="0" y="0" drill="1.1" diameter="1.4224" shape="long" rot="R90"/>
 <pad name="3" x="2.54" y="0" drill="1.1" diameter="1.4224" shape="long" rot="R90"/>
-<text x="-5.715" y="-1.905" size="1.016" layer="25" rot="R90">&gt;NAME</text>
+<text x="-5.08" y="3.175" size="1.778" layer="25">&gt;NAME</text>
 <text x="-5.08" y="-5.08" size="1.778" layer="27">&gt;VALUE</text>
 </package>
 </packages>
@@ -2559,8 +2559,8 @@ type 0309, grid 12.5 mm</description>
 <wire x1="4.064" y1="1.524" x2="3.429" y2="1.524" width="0.1524" layer="21"/>
 <wire x1="4.064" y1="-1.524" x2="3.429" y2="-1.524" width="0.1524" layer="21"/>
 <wire x1="4.318" y1="-1.27" x2="4.318" y2="1.27" width="0.1524" layer="21"/>
-<pad name="1" x="-6.35" y="0" drill="0.8128" shape="octagon"/>
-<pad name="2" x="6.35" y="0" drill="0.8128" shape="octagon"/>
+<pad name="1" x="-6.35" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
+<pad name="2" x="6.35" y="0" drill="0.8128" diameter="1.6764" shape="octagon"/>
 <text x="-4.191" y="1.905" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="-3.175" y="-0.6858" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
 <rectangle x1="4.318" y1="-0.3048" x2="5.1816" y2="0.3048" layer="21"/>
@@ -4158,7 +4158,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="U$2" library="My Library" deviceset="STP04CM05" device="STP04CM05" value="STP04CM05"/>
 <part name="FRAME1" library="frames" deviceset="LETTER_P" device=""/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
-<part name="S1" library="switch" deviceset="TL32PO" device="" value=""/>
+<part name="S1" library="switch" deviceset="TL32PO" device="" value="TL32PO"/>
 <part name="G1" library="battery" deviceset="AB9V" device="" value=""/>
 <part name="J1" library="My Library" deviceset="GROVE-4P-2.0" device=""/>
 <part name="S2" library="switch-tact" deviceset="DTS-3" device=""/>
@@ -4334,6 +4334,9 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="104,1,33.02,5.08,MOD1,VIN,BATT,,,"/>
+</errors>
 </schematic>
 </drawing>
 </eagle>

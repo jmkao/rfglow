@@ -1,5 +1,5 @@
 [Eagle]
-Version="06 05 00"
+Version="07 01 00"
 Platform="Linux"
 Serial="62191E841E-LSR-WLM-1EL"
 Globals="Globals"
@@ -7,6 +7,7 @@ Desktop="Desktop"
 
 [Globals]
 AutoSaveProject=1
+UsedLibrary="/opt/eagle-7.1.0/lbr/solpad.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/19inch.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/40xx.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/41xx.lbr"
@@ -287,9 +288,7 @@ UsedLibrary="/opt/eagle-6.5.0/lbr/sipex.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/smd-ipc.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/smd-special.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/solomon-systech.lbr"
-UsedLibrary="/opt/eagle-6.5.0/lbr/solpad.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/special-drill.lbr"
-UsedLibrary="/opt/eagle-6.5.0/lbr/special.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/st-microelectronics.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/supertex.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/supply1.lbr"
@@ -342,74 +341,29 @@ UsedLibrary="/opt/eagle-6.5.0/lbr/zetex.lbr"
 UsedLibrary="/opt/eagle-6.5.0/lbr/zilog.lbr"
 UsedLibrary="/home/jkao/eagle/libraries/_hhn_Pololu.lbr"
 UsedLibrary="/home/jkao/eagle/libraries/Eagle-Libraries/Knobs-Buttons-Switches/switch-tact.lbr"
+UsedLibrary="/home/jkao/eagle/libraries/My Library.lbr"
 
 [Win_1]
-Type="Control Panel"
-Loc="1108 408 2475 1387"
-State=2
-Number=0
-
-[Win_2]
-Type="Board Editor"
-Loc="629 14 2053 1561"
-State=2
-Number=3
-File="RF Glow Stick.brd"
-View="-8.70864 -2.84254 20.7716 51.7329"
-WireWidths=" 0 0.254 0.3048 0.8128 1.4224 1.6764 1.778 1.9304 3.81 6.4516 0.4064 0.6096 1.27 2.54 2.1844 1.016"
-PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.54 3.81 6.4516 0 2.1844"
-PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
-ViaDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.54 3.81 6.4516 0 2.1844"
-ViaDrills=" 0.5 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6"
-HoleDrills=" 0.5 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6"
-TextSizes=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.778"
-PolygonSpacings=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.27"
-PolygonIsolates=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
-MiterRadiuss=" 0.254 0.3175 0.635 1.27 2.54 1 2 2.5 5 7.5 10 0"
-DimensionWidths=" 0 0.127 0.254 0.1 0.26 0.13"
-DimensionExtWidths=" 0.127 0.254 0.1 0.13 0.26 0"
-DimensionExtLengths=" 1.27 2.54 1 2 3 0"
-DimensionExtOffsets=" 1.27 2.54 1 2 3 0"
-SmdSizes=" 0.3048 0.1524 0.4064 0.2032 0.6096 0.3048 0.8128 0.4064 1.016 0.508 1.27 0.6604 1.4224 0.7112 1.6764 0.8128 1.778 0.9144 1.9304 0.9652 2.1844 1.0668 2.54 1.27 3.81 1.9304 5.08 2.54 6.4516 3.2512 1.27 0.635"
-WireBend=0
-WireBendSet=0
-WireCap=1
-MiterStyle=0
-PadShape=0
-ViaShape=0
-PolygonPour=0
-PolygonRank=1
-PolygonThermals=1
-PolygonOrphans=0
-TextRatio=8
-DimensionUnit=1
-DimensionPrecision=2
-DimensionShowUnit=0
-PinDirection=3
-PinFunction=0
-PinLength=2
-PinVisible=3
-SwapLevel=0
-ArcDirection=0
-AddLevel=2
-PadsSameType=0
-Layer=1
-
-[Win_3]
 Type="CAM Processor"
-Loc="917 138 2494 1408"
+Loc="887 108 2464 1378"
 State=2
 Number=2
 File="RF Glow Stick.brd"
 Job="/home/jkao/eagle/Seeed_Gerber_Generater_2-layer.cam"
 
-[Win_4]
+[Win_2]
+Type="Control Panel"
+Loc="1144 279 2511 1258"
+State=2
+Number=0
+
+[Win_3]
 Type="Schematic Editor"
-Loc="135 57 1894 1419"
+Loc="86 128 1845 1490"
 State=2
 Number=1
 File="RF Glow Stick.sch"
-View="1.14985 20.8724 78.9844 125.247"
+View="-42.0875 -44.8845 92.4106 135.475"
 WireWidths=" 0 0.3048 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.5 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8"
@@ -448,8 +402,54 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
-Views=" 1: 1.14985 20.8724 78.9844 125.247"
-Sheet=1
+Views=" 1: -42.0875 -44.8845 92.4106 135.475"
+Sheet="1"
+
+[Win_4]
+Type="Board Editor"
+Loc="650 114 1861 1468"
+State=2
+Number=3
+File="RF Glow Stick.brd"
+View="-7.112 -7.57555 32.512 56.1531"
+WireWidths=" 0 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0.4064 0.127 0.1778 0.0254 0.254 0.2286 6.35 0.2032"
+PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
+PadDrills=" 0.6 0.7 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.8 0.5588"
+ViaDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
+ViaDrills=" 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6 0.5588"
+HoleDrills=" 0.7 0.8 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 2 2.2 2.8 3.2 0.6 0.5588"
+TextSizes=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.778"
+PolygonSpacings=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 5.08 6.4516 1.27"
+PolygonIsolates=" 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0 0.0254"
+MiterRadiuss=" 0.254 0.3175 0.635 1.27 2.54 1 2 2.5 5 7.5 10 0"
+DimensionWidths=" 0 0.127 0.254 0.1 0.26 0.13"
+DimensionExtWidths=" 0.127 0.254 0.1 0.13 0.26 0"
+DimensionExtLengths=" 1.27 2.54 1 2 3 0"
+DimensionExtOffsets=" 1.27 2.54 1 2 3 0"
+SmdSizes=" 0.3048 0.1524 0.4064 0.2032 0.6096 0.3048 0.8128 0.4064 1.016 0.508 1.27 0.6604 1.4224 0.7112 1.6764 0.8128 1.778 0.9144 1.9304 0.9652 2.1844 1.0668 2.54 1.27 3.81 1.9304 5.08 2.54 6.4516 3.2512 1.27 0.635"
+WireBend=4
+WireBendSet=0
+WireCap=1
+MiterStyle=0
+PadShape=0
+ViaShape=0
+PolygonPour=0
+PolygonRank=6
+PolygonThermals=1
+PolygonOrphans=1
+TextRatio=8
+DimensionUnit=1
+DimensionPrecision=2
+DimensionShowUnit=0
+PinDirection=3
+PinFunction=0
+PinLength=2
+PinVisible=3
+SwapLevel=0
+ArcDirection=0
+AddLevel=2
+PadsSameType=0
+Layer=16
 
 [Desktop]
 Screen="2560 1600"
