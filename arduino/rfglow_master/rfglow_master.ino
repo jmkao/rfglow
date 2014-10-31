@@ -43,7 +43,7 @@ void setup()
   cc1101.init();
   cc1101.setCarrierFreq(CFREQ_868);
 
- cc1101.writeReg(CC1101_PKTLEN,0x10);  //Packet Length
+ cc1101.writeReg(CC1101_PKTLEN,0x5);  //Packet Length
 //  cc1101.writeReg(CC1101_PKTCTRL1,0x04);//Packet Automation Control
   cc1101.writeReg(CC1101_PKTCTRL0,0x45);//Packet Automation Control
 //  cc1101.writeReg(CC1101_ADDR,0x00);    //Device Address
@@ -187,18 +187,21 @@ void sendCurrentColor() {
 void sendCommand(unsigned int hue, unsigned int saturation, unsigned int brightness) {
   CCPACKET packet;
 
-  packet.length = 7;
+  packet.length = 5;
   packet.data[0] = receiverAddress;
+  packet.data[1] = (hue >> 8) & 0xFF;
+  packet.data[2] = hue & 0xFF;
+  packet.data[3] = saturation;
+  packet.data[4] = brightness;
 
+  /*
   packet.data[1] = (hue >> 8) & 0xFF;
   packet.data[2] = hue & 0xFF;
   packet.data[3] = (saturation >> 8) & 0xFF;
   packet.data[4] = saturation & 0xFF;
   packet.data[5] = (brightness >> 8) & 0xFF;
   packet.data[6] = brightness & 0xFF;
-  
-  Serial.print("Hue: ");
-  Serial.println(hue);
+  */
   
   /*
   Serial.println(packet.length);

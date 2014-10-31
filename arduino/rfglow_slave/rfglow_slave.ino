@@ -84,7 +84,7 @@ void setup()
   cc1101.init();
   cc1101.setCarrierFreq(CFREQ_868);
 
-  cc1101.writeReg(CC1101_PKTLEN,0x10);  //Packet Length
+  cc1101.writeReg(CC1101_PKTLEN,0x5);  //Packet Length
 //  cc1101.writeReg(CC1101_PKTCTRL1,0x04);//Packet Automation Control
   cc1101.writeReg(CC1101_PKTCTRL0,0x45);//Packet Automation Control
 //  cc1101.writeReg(CC1101_ADDR,0x00);    //Device Address
@@ -155,9 +155,21 @@ void processData(byte *data) {
   unsigned int brightness;
 
   hue = ((data[1] << 8) + data[2]);
+  saturation = data[3];
+  brightness = data[4];
+  
+/*
+  hue = ((data[1] << 8) + data[2]);
   saturation = ((data[3] << 8) + data[4]);
   brightness = ((data[5] << 8) + data[6]);
-  
-  Serial.println("Process Data");
+*/
+/*
+  Serial.print("Received values: ");
+  Serial.print(hue);
+  Serial.print(", ");
+  Serial.print(saturation);
+  Serial.print(", ");
+  Serial.println(brightness);
+  */
   ShiftPWM.SetHSV(0, hue, saturation, brightness);
 }
