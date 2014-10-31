@@ -1,0 +1,6 @@
+[submodule "arduino/libraries/Adafruit_BLE_UART"]
+	path = arduino/libraries/Adafruit_BLE_UART
+	url = https://github.com/adafruit/Adafruit_nRF8001.git
+[submodule "arduino/libraries/ShiftPWM"]
+	path = arduino/libraries/ShiftPWM
+	url = https://github.com/elcojacobs/ShiftPWM.git
