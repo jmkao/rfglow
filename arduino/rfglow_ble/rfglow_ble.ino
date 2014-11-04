@@ -112,7 +112,7 @@ void rxCallback(uint8_t *buffer, uint8_t len)
   Serial.print(len);
   
   Serial.print(F(" bytes: "));
-  /*
+  
   for(int i=0; i<len; i++)
    Serial.print((char)buffer[i]); 
 
@@ -122,7 +122,7 @@ void rxCallback(uint8_t *buffer, uint8_t len)
     Serial.print(" 0x"); Serial.print((char)buffer[i], HEX); 
   }
   Serial.print(F(" ]"));
-  */
+  
   Serial.println();
 
   if (len == 4) {
@@ -152,6 +152,7 @@ void rxCallback(uint8_t *buffer, uint8_t len)
       c_hue = hue;
       c_saturation = saturation;
       c_brightness = brightness;
+      sends = 0;
       Serial.print("Parsed values: ");
       Serial.print(c_hue);
       Serial.print(", ");
