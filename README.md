@@ -13,12 +13,13 @@ There are 3 basic component areas:
 http://ost.io/@jmkao/rfglow
 
 ## Status
-This project is still quite a ways from being finished. All of the areas are sufficiently functional to demonstrate a proof of concept, but requires more work before a working device could actually be used in a physically demanding environment.
+This project is fairly usable, although could use some additional polish. All of the areas are sufficiently functional to demonstrate a proof of concept, but requires more testing before a device could actually be used in a physically demanding environment.
 
 The primary items that need work are:
- * Handle design - complete an actual printable and usable handle
+ * App for the BLE master
+ * Handle design - Refactor to be more compact and with more practical design, especially for the coupler and attachemnt of the two halves
  * RF Master - Integrate a 0.96" color OLED screen, then design a PCB for it
- * RF Slave - Update PCB to put power switch in a more sane location and have at least 1 button for local control
+ * RF Slave - Code something for the button to do
 
 Then there are other interesting things that one could do with a microcontroller:
  * Fade commands
@@ -47,6 +48,10 @@ The PCB is really a kind of motherboard for a variety of sub-assemblies (other b
     * Cable White --> LED Green
     * Cable Yellow --> LED Blue
     * Cable Black --> LED Common Ground
+ * Adafruit nRF8001 (https://www.adafruit.com/products/1697)
+  * Used for the rfglow_relay code which will relay commands from the nRF8001's BLE interface to the glow sticks.
+  * Would allow a mobile app (e.g. iOS, Android) on a BLE capable device to control the glow sticks with a more advanced interface
+  * A panstamp must be used as the microcontroller to build this device because the nRF8001 must be wired to the hardware SPI interface, and the RFBee does not expose the pins necessary to do this.
 
 # Microcontroller Code
 
@@ -56,7 +61,16 @@ Arudino Code for 1.0.x.
   * Code for the glow sticks themselves
  * rfglow_master
   * Code for a potential master
-  * Currently has 3 buttons wired up to change the hue and put it into an automatic color cycling mode.
+  * Currently supported gestures:
+   * Color change - short press on left and right
+   * LED on/off - long press on the center to toggle
+   * Auto color cycling mode - short press on center to toggle
+   * Brightness change - long press on left or right
+ * rfglow_ble
+  * BLE based master that will relay color change commands over BLE to the RF glow sticks
+  * Usable today for simple color changes with the iOS nRF UART or LightBlue apps
+   * For nRF UART, send ASCII of 3 numbers separated by spaces, like "270 255 32\n". This is an HSV value, with the first digit as hue (0-359), second digit as saturation (0-255), and third digit as brightness (0-255)
+   * For LightBlue (and really for any app you design yourself), send 4 bytes to the write characteristic of the service. The first 2 bytes are a 16-bit unsigned int for hue (only valid from 0-355), the 3rd byte is the unsigned 8-bit int for saturation, the 4th byte is the unsigned 8-bit int for brightness.
  * rfglow_serial
   * Code for when the master is connected to a computer, in which case you can enter the hue, saturation, and brightness as tuples over the serial line to send the command.
   * This code hasn't been touched in a while, and needs to have the radio settings from rfglow_master copied into it for it to actually work with the current version of rfglow_slave
@@ -72,5 +86,9 @@ The Arduino code depends on the following libraries:
 
 Autodesk Inventor parts and assembly with the current design, to be FFF 3D printed (e.g. <45 degree overhangs, etc...).
 
-This design is in early stages and my CAD skills are weak. The CAD files can serve as a dimensional guide for stuff like the screw-on diffuser coupler and are printable, but do not yet produce a fully functional part.
+This design is quite messy becuase my CAD skills are week, and the parameters are difficult to adjust. However, it is functional with the following features:
+* Lip-and-groove attachment between top and bottom halves to facilitate alignment
+ * There is some clearance, so the groove is deeper than the lip sticks out
+* Coupler to screw on a king blade diffuser on one end, then attach to the handle
+* Cups for magnets to help hold the top and bottom together (0.25" X 0.125" X 0.0625" rare earth)
 
