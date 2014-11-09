@@ -49,7 +49,7 @@ The PCB is really a kind of motherboard for a variety of sub-assemblies (other b
     * Cable Yellow --> LED Blue
     * Cable Black --> LED Common Ground
  * Adafruit nRF8001 (https://www.adafruit.com/products/1697)
-  * Used for the rfglow_relay code which will relay commands from the nRF8001's BLE interface to the glow sticks.
+  * Used for the rfglow_ble code which will relay commands from the nRF8001's BLE interface to the glow sticks.
   * Would allow a mobile app (e.g. iOS, Android) on a BLE capable device to control the glow sticks with a more advanced interface
   * A panstamp must be used as the microcontroller to build this device because the nRF8001 must be wired to the hardware SPI interface, and the RFBee does not expose the pins necessary to do this.
 
