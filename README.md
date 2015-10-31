@@ -86,9 +86,8 @@ The Arduino code depends on the following libraries:
 
 Autodesk Inventor parts and assembly with the current design, to be FFF 3D printed (e.g. <45 degree overhangs, etc...).
 
-This design is quite messy becuase my CAD skills are week, and the parameters are difficult to adjust. However, it is functional with the following features:
+This design is quite messy becuase my CAD skills are weak, and the parameters are difficult to adjust. However, it is functional with the following features:
 * Lip-and-groove attachment between top and bottom halves to facilitate alignment
  * There is some clearance, so the groove is deeper than the lip sticks out
 * Coupler to screw on a king blade diffuser on one end, then attach to the handle
 * Cups for magnets to help hold the top and bottom together (0.25" X 0.125" X 0.0625" rare earth)
-
