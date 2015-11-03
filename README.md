@@ -49,7 +49,7 @@ The PCB is really a kind of motherboard for a variety of sub-assemblies (other b
     * Cable Yellow --> LED Blue
     * Cable Black --> LED Common Ground
  * Adafruit nRF8001 (https://www.adafruit.com/products/1697)
-  * Used for the rfglow_relay code which will relay commands from the nRF8001's BLE interface to the glow sticks.
+  * Used for the rfglow_ble code which will relay commands from the nRF8001's BLE interface to the glow sticks.
   * Would allow a mobile app (e.g. iOS, Android) on a BLE capable device to control the glow sticks with a more advanced interface
   * A panstamp must be used as the microcontroller to build this device because the nRF8001 must be wired to the hardware SPI interface, and the RFBee does not expose the pins necessary to do this.
 
@@ -86,9 +86,8 @@ The Arduino code depends on the following libraries:
 
 Autodesk Inventor parts and assembly with the current design, to be FFF 3D printed (e.g. <45 degree overhangs, etc...).
 
-This design is quite messy becuase my CAD skills are week, and the parameters are difficult to adjust. However, it is functional with the following features:
+This design is quite messy becuase my CAD skills are weak, and the parameters are difficult to adjust. However, it is functional with the following features:
 * Lip-and-groove attachment between top and bottom halves to facilitate alignment
  * There is some clearance, so the groove is deeper than the lip sticks out
 * Coupler to screw on a king blade diffuser on one end, then attach to the handle
 * Cups for magnets to help hold the top and bottom together (0.25" X 0.125" X 0.0625" rare earth)
-
