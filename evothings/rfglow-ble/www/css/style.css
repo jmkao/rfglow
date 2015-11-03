@@ -1,0 +1,72 @@
+/* Empty. Add your own CSS if you like */
+.red {
+    background-color: #FF0000;
+}
+
+.green {
+    background-color: #00FF00;
+}
+
+.blue {
+    background-color: #0000FF;
+}
+
+.cyan {
+    background-color: #00FFFF;
+}
+
+.magenta {
+    background-color: #FF00FF;
+}
+
+.yellow {
+    background-color: #FFFF00;
+}
+
+.pink {
+    background-color: #ffc0cb;
+}
+
+.orange {
+    background-color: #ffa500;
+}
+
+.white {
+    background-color: #FFFFFF;
+}
+
+.hibiki {
+    background-color: #00FFFF;
+}
+
+.lblue {
+    background-color: #AAAAFF;
+}
+
+.no-padding {
+    padding: 0px !important;
+}
+
+.no-vmargin {
+  margin-top: -5px !important;
+
+}
+
+.big-vpadding {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    //-webkit-appearance: none;
+    position: relative;
+    //top: -1px;
+    //z-index: 1;
+    width: 40px;
+    height: 40px;
+ 
+    -webkit-border-radius: 80px;
+    -moz-border-radius: 80px;
+    border-radius: 80px;
+    //background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ebf1f6), color-stop(50%,#abd3ee), color-stop(51%,#89c3eb), color-stop(100%,#d5ebfb));
+}
