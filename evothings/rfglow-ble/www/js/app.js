@@ -1,13 +1,15 @@
 var root;
 
 Ionic.io();
-var user = Ionic.User.current();
-if (!user.id) {
-  user.id = Ionic.User.anonymousId();
-}
-user.save();
+// var user = Ionic.User.current();
+// if (!user.id) {
+//   user.id = Ionic.User.anonymousId();
+// }
+// user.save();
 
 window.ionic.Platform.ready(function() {
+  TestFairy.begin("e08d14885c1c81442f3329f9809554086920ff63");
+  StatusBar.hide();
   angular.bootstrap(document, ['rfglow-ble']);
   blecontrol.initialize();
 })
@@ -27,12 +29,61 @@ angular.module('rfglow-ble', ['ionic'])
   });
 })
 
-.controller('RfglowCtrl', function($scope) {
+.controller('RfglowCtrl', function($scope, $ionicModal) {
+  console.log("Checking Ionic Deploy");
+  var deploy = new Ionic.Deploy();
+
+  deploy.check().then(function(isDeployAvailable) {
+    // isDeployAvailable will be true if there is an update
+    // and false otherwise
+    if (isDeployAvailable) {
+      console.log("New Ionic Deploy update is available!");
+      deploy.update().then(function(deployResult) {
+        // deployResult will be true when successfull and
+        // false otherwise
+      }, function(deployUpdateError) {
+        // fired if we're unable to check for updates or if any
+        // errors have occured.
+      }, function(deployProgress) {
+        // this is a progress callback, so it will be called a lot
+        // deployProgress will be an Integer representing the current
+        // completion percentage.
+      });
+    }
+  }, function(deployCheckError) {
+    // unable to check for deploy updates
+    console.log("Error checking for Ionic Deploy update: "+deployCheckError);
+  });
+
   console.log("RfglowCtrl init");
 
   $scope.ble = blecontrol;
   blecontrol.$scope = $scope;
   console.log("State: "+$scope.ble.state);
+
+  $ionicModal.fromTemplateUrl('templates/ble-popover.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.bleModal = modal;
+    modal.show();
+  });
+
+  $scope.closeBLEModal = function () {
+    $scope.bleModal.hide();
+  };
+
+  $scope.openBLEModal = function () {
+    $scope.bleModal.show();
+  }
+
+  $scope.$watch('ble.state', function(newValue, oldValue) {
+    if (newValue == "Connected" && oldValue != "Connected") {
+      $scope.closeBLEModal();
+    } else if (newValue != "Connected" && oldValue == "Connected") {
+      $scope.openBLEModal();
+    }
+  });
 
   $scope.state = {
     hue: 0,

@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>RFGlow BLE</title>
 
-    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="lib/ionic/css/ionic.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
     <script type="text/javascript">
@@ -17,54 +17,66 @@
     <script src="js/ble.js"></script>
 
     <!-- ionic framework reqs -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/ionic/js/ionic.bundle.min.js"></script>
     <script src="lib/ionic-platform-web-client/dist/ionic.io.bundle.min.js"></script>
     <!-- Cordova is bootstrapped by ionic-platform-web-client, uncomment this if you remove ionic-platform-web-client... -->
     <!-- <script src="cordova.js"></script> -->
 
     <script src="js/app.js"></script>
   </head>
-  <body ng-controller="RfglowCtrl">
+  <body ng-controller="RfglowCtrl" class="platform-ios">
     <ion-pane>
       <ion-content scroll="false">
-          <div class="row row-center">
-              Status: {{ble.state}}
-          </div>
           <div class="row">
             <button ng-click="updateHS(0, 255)" class="col button button-block red">Red</button>
             <button ng-click="updateHS(120, 255)" class="col button button-block green">Green</button>
             <button ng-click="updateHS(240, 255)" class="col button button-block blue">Blue</button>
           </div>
           <div class="row">
-            <button ng-click="updateHS(180, 255)" class="col button button-block cyan">Cyan</button>
-            <button ng-click="updateHS(300, 255)" class="col button button-block magenta">Magenta</button>
-            <button ng-click="updateHS(60, 255)" class="col button button-block yellow">Yellow</button>
+            <button ng-click="updateHS(180, 255)" class="col button button-block cyan no-vmargin">Cyan</button>
+            <button ng-click="updateHS(300, 255)" class="col button button-block magenta no-vmargin">Magenta</button>
+            <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
           </div>
           <div class="row">
-            <button ng-click="updateHS(340, 128)" class="col button button-block pink">Pink</button>
-            <button ng-click="updateHS(30, 255)" class="col button button-block orange">Orange</button>
-            <button ng-click="updateHS(240, 32)" class="col button button-block white">White</button>
+            <button ng-click="updateHS(340, 128)" class="col button button-block pin no-vmargin">Pink</button>
+            <button ng-click="updateHS(30, 255)" class="col button button-block orange no-vmargin">Orange</button>
+            <button ng-click="updateHS(240, 32)" class="col button button-block white no-vmargin">White</button>
           </div>
           <div class="row">
-            <div class="item range range-positive row big-vpadding">
+            <div class="item range range-positive row">
               <i class="icon ion-lightbulb"></i>
               <input ng-model="state.brightness" ng-change="sendUpdate()" type="range" name="volume" min="0" max="255" value="64">
             </div>
           </div>
            <div class="row">
-            <div class="item range range-positive row big-vpadding">
+            <div class="item range range-positive row">
               <i class="icon ion-paintbucket"></i>
               <input ng-model="state.saturation" ng-change="sendUpdate()" type="range" name="volume" min="0" max="255" value="64">
             </div>
           </div>
           <div class="row">
-            <button ng-click="updateHSV(30,255,255)" class="col button button-block orange no-vmargin">Ultra Orange</button>
-            <button ng-click="updateReset()" class="col button button-block button-dark no-vmargin">Reset</button>
+            <button ng-click="updateHSV(30,255,255)" class="col button button-block orange">Ultra Orange</button>
+            <button ng-click="updateReset()" class="col button button-block button-dark">Reset</button>
           </div>
           <div class="row">
             <button class="col button button-dark button-block" ng-click="updateOff()">Off</button>
           </div>
+          <div class="row status">
+              <div class="col status">Status: {{ble.state}}</div>
+          </div>
       </ion-content>
     </ion-pane>
+    <script id="templates/ble-popover.html" type="text/ng-template">
+      <ion-modal-view class="modal-float card">
+        <ion-header-bar class="bar-dark">
+            <h1 class="title">BLE Status: {{ble.state}}</h1>
+        </ion-header-bar>
+        <ion-content class="center">
+          <div class="col text-center">
+            <button ng-click="closeBLEModal()" class="button button-stable">Dismiss</button>
+          </div>
+        </ion-content>
+      </ion-modal-view>
+    </script>
   </body>
 </html>

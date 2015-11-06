@@ -1,5 +1,5 @@
 if (!window.blecontrol) {
-  
+
   window.blecontrol = (function() {
     var blecontrol = {
       state: "Pre-init",
@@ -18,7 +18,9 @@ if (!window.blecontrol) {
         this.easyble.reset();
         this.easyble.reportDeviceOnce(true);
         this.device = null;
-        this.startScan();
+        setTimeout(function () {
+          blecontrol.startScan();
+        }, 2000);
       },
 
       // h, s, v = hue (0-359), saturation (0-255), brightness (0-255)
@@ -34,13 +36,13 @@ if (!window.blecontrol) {
           }
           return;
         }
-      
+
         var blePayload = new Uint8Array(4);
         blePayload[0] = (h >> 8) & 0x00FF;
         blePayload[1] = h & 0x00FF;
         blePayload[2] = s;
         blePayload[3] = v;
-        
+
         console.log("Calling device with payload: "+blePayload[0]+", "+blePayload[1]+", "+blePayload[2]+", "+blePayload[3]);
         this.device.writeCharacteristic(
           this.txUUID,
@@ -55,7 +57,7 @@ if (!window.blecontrol) {
           }
         );
       },
-    
+
       initDevice: function(device) {
         this.state = "Found device";
         this.$scope.$apply();
@@ -63,20 +65,20 @@ if (!window.blecontrol) {
           function(device) {
             blecontrol.state = "Polling device";
             blecontrol.$scope.$apply();
-            device.readServices(
-              [blecontrol.serviceUUID],
-              function(device) {
-                blecontrol.state = "Connected";
-                blecontrol.$scope.$apply();
-                blecontrol.device = device;
-                console.log("Read services from device");
-              },
-              function(errorCode) {
-                console.log("Failed to read services with error: "+errorCode);
-                console.log("Reinitializing");
-                blecontrol.initialize();
-              }
-            );
+              device.readServices(
+                [blecontrol.serviceUUID],
+                function(device) {
+                  blecontrol.state = "Connected";
+                  blecontrol.$scope.$apply();
+                  blecontrol.device = device;
+                  console.log("Read services from device");
+                },
+                function(errorCode) {
+                  console.log("Failed to read services with error: "+errorCode);
+                  console.log("Reinitializing");
+                  blecontrol.initialize();
+                }
+              );
           },
           function(errorCode) {
             blecontrol.state = "Error";
@@ -86,19 +88,19 @@ if (!window.blecontrol) {
           }
         )
       },
-  
+
       startScan: function() {
         console.log("Scanning")
         this.state = "Scanning";
         this.$scope.$apply();
-  
+
         this.easyble.startScan(
           function(device) {
             if (device != null && device.name != null) {
               console.log("Found device: "+device.name);
               if (device.name == 'RFGLOW') {
-                blecontrol.easyble.stopScan();
-                blecontrol.initDevice(device);
+                  blecontrol.easyble.stopScan();
+                  blecontrol.initDevice(device);
               }
             }
           },

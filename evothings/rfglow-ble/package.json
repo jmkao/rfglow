@@ -21,14 +21,13 @@
     "cordova-plugin-device",
     "cordova-plugin-console",
     "cordova-plugin-dialogs",
-    "cordova-plugin-inappbrowser",
-    "cordova-plugin-device-motion",
-    "cordova-plugin-device-orientation",
     "cordova-plugin-ble",
-    "cordova-plugin-network-information",
     "cordova-plugin-legacy-whitelist",
-    "cordova-plugin-chrome-apps-iossocketscommon",
-    "cordova-plugin-statusbar"
+    "cordova-plugin-statusbar",
+    {
+      "locator": "https://github.com/testfairy/testfairy-cordova-plugin",
+      "id": "com.testfairy.cordova-plugin"
+    }
   ],
   "cordovaPlatforms": [
     "ios"
