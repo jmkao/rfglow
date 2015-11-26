@@ -9,7 +9,7 @@
 
 
 // My Debug Setup
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
   #define DEBUG_PRINTLN(x) Serial.println (x)
   #define DEBUG_PRINT(x) Serial.print (x)
@@ -75,12 +75,12 @@ void setup()
   DEBUG_PRINT("Receiver address = ");
   DEBUG_PRINTLN(receiverAddress);
   
-  leavePanStampSPI();
+  //leavePanStampSPI();
 
-  BTLEserial.setRXcallback(rxCallback);
-  BTLEserial.setACIcallback(aciCallback);
-  BTLEserial.setDeviceName("RFGLOW");
-  BTLEserial.begin();
+  //BTLEserial.setRXcallback(rxCallback);
+  //BTLEserial.setACIcallback(aciCallback);
+  //BTLEserial.setDeviceName("RFGLOW");
+  //BTLEserial.begin();
 }
 
 unsigned long previousMs = 0;
@@ -93,7 +93,7 @@ void loop() {
   unsigned long currentMs = millis();
   
   // Tell the nRF8001 to do whatever it should be working on.
-  BTLEserial.pollACI();
+  //BTLEserial.pollACI();
   
   // Only check for a pending update if more than LED_UPDATE_INTERVAL_MS
   // has passed since we last sent an update
