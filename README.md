@@ -53,6 +53,8 @@ The PCB is really a kind of motherboard for a variety of sub-assemblies (other b
   * Would allow a mobile app (e.g. iOS, Android) on a BLE capable device to control the glow sticks with a more advanced interface
   * A panstamp must be used as the microcontroller to build this device because the nRF8001 must be wired to the hardware SPI interface, and the RFBee does not expose the pins necessary to do this.
 
+The version of the BLE master in this repository is for an unamplified version that uses a Panstamp. There is also an amplified designed that uses a CC1101+CC1190 evaluation module. The schematics and board layout for that were done in Upverter and are available at https://upverter.com/jkao/e86d81299623de9d/RFGlow-BLE-CC1109-Relay/
+
 # Microcontroller Code
 
 Arudino Code for 1.0.x.
