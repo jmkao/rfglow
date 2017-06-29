@@ -1,4 +1,4 @@
-#include <ClickButton.h>]=[
+#include <ClickButton.h>
 
 #include <EEPROM.h>
 #include "panstamp.h"

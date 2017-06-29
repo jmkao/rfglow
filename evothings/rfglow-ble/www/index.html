@@ -38,7 +38,7 @@
             <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
           </div>
           <div class="row">
-            <button ng-click="updateHS(340, 128)" class="col button button-block pin no-vmargin">Pink</button>
+            <button ng-click="updateHS(340, 128)" class="col button button-block pink no-vmargin">Pink</button>
             <button ng-click="updateHS(30, 255)" class="col button button-block orange no-vmargin">Orange</button>
             <button ng-click="updateHS(240, 32)" class="col button button-block white no-vmargin">White</button>
           </div>
@@ -55,10 +55,12 @@
             </div>
           </div>
           <div class="row">
+            <button ng-click="updateHSV(260, 192, 192)" class="col button button-block purple">Purple</button>
             <button ng-click="updateHSV(30,255,255)" class="col button button-block orange">Ultra Orange</button>
             <button ng-click="updateReset()" class="col button button-block button-dark">Reset</button>
           </div>
           <div class="row">
+            <button ng-click="cycleHS([[0,255],[240,100],[60,255],[240,255],[260,192],[120,255],[30,255]], 500)" class="col button button-block white">WUG</button>
             <button class="col button button-dark button-block" ng-click="updateOff()">Off</button>
           </div>
           <div class="row status">

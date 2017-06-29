@@ -8,7 +8,7 @@ Ionic.io();
 // user.save();
 
 window.ionic.Platform.ready(function() {
-  TestFairy.begin("e08d14885c1c81442f3329f9809554086920ff63");
+  //TestFairy.begin("e08d14885c1c81442f3329f9809554086920ff63");
   StatusBar.hide();
   angular.bootstrap(document, ['rfglow-ble']);
   blecontrol.initialize();
@@ -93,15 +93,18 @@ angular.module('rfglow-ble', ['ionic'])
     prevS: 255,
     prevB: 64,
     off: true,
+    cycle: false,
     lastUpdateMs: 0
   }
 
   $scope.updateOff = function() {
+    $scope.state.cycle = false;
     $scope.state.off = true;
     $scope.sendUpdate();
   }
 
   $scope.updateReset = function() {
+    $scope.state.cycle = false;
     $scope.state.hue = 0;
     $scope.state.saturation = 255;
     $scope.state.brightness = 64;
@@ -124,6 +127,26 @@ angular.module('rfglow-ble', ['ionic'])
     $scope.state.brightness = v;
     $scope.state.off = false;
     $scope.sendUpdate();
+  }
+
+  $scope.cycleHS = function(hsArray, delayMs) {
+    $scope.state.cycle = true;
+    console.log("Cycle on");
+
+    var counter = 0;
+    var looper = function() {
+      var index = counter%hsArray.length;
+      counter++;
+      $scope.updateHS(hsArray[index][0], hsArray[index][1]);
+      console.log("Cycle loop")
+      if ($scope.state.cycle) {
+        setTimeout(looper, delayMs);
+      } else {
+        $scope.updateOff();
+      }
+    }
+
+    looper();
   }
 
   $scope.sendUpdate = function() {

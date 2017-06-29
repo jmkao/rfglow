@@ -43,6 +43,10 @@
     background-color: #AAAAFF;
 }
 
+.purple {
+    background-color: #800080;
+}
+
 .no-padding {
     padding: 0px !important;
 }
