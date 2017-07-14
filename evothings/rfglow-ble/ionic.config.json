@@ -1,4 +1,6 @@
 {
   "name": "rfglow-ble",
-  "app_id": "8a7ce9a7"
+  "app_id": "0ba1c21e",
+  "type": "ionic1",
+  "watchPatterns": []
 }

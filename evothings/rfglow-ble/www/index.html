@@ -19,6 +19,9 @@
     <!-- ionic framework reqs -->
     <script src="lib/ionic/js/ionic.bundle.min.js"></script>
     <script src="lib/ionic-platform-web-client/dist/ionic.io.bundle.min.js"></script>
+    <script src="lib/ionic.cloud.min.js"></script>
+    <script type="text/javascript" src="lib/ng-rollbar/ng-rollbar.min.js"></script>
+    <script src="js/ionic.swipecards.js"></script>
     <!-- Cordova is bootstrapped by ionic-platform-web-client, uncomment this if you remove ionic-platform-web-client... -->
     <!-- <script src="cordova.js"></script> -->
 
@@ -27,45 +30,157 @@
   <body ng-controller="RfglowCtrl">
     <ion-pane>
       <ion-content scroll="false">
-          <div class="row">
-            <button ng-click="updateHS(0, 255)" class="col button button-block red">Red</button>
-            <button ng-click="updateHS(120, 255)" class="col button button-block green">Green</button>
-            <button ng-click="updateHS(240, 255)" class="col button button-block blue">Blue</button>
-          </div>
-          <div class="row">
-            <button ng-click="updateHS(180, 255)" class="col button button-block cyan no-vmargin">Cyan</button>
-            <button ng-click="updateHS(300, 255)" class="col button button-block magenta no-vmargin">Magenta</button>
-            <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
-          </div>
-          <div class="row">
-            <button ng-click="updateHS(340, 128)" class="col button button-block pink no-vmargin">Pink</button>
-            <button ng-click="updateHS(30, 255)" class="col button button-block orange no-vmargin">Orange</button>
-            <button ng-click="updateHS(240, 32)" class="col button button-block white no-vmargin">White</button>
-          </div>
-          <div class="row">
-            <div class="item range range-positive row">
-              <i class="icon ion-lightbulb"></i>
-              <input ng-model="state.brightness" ng-change="sendUpdate()" type="range" name="volume" min="0" max="255" value="64">
+        <div class="row">
+          <button ng-click="updateHSV(30,255,255)" class="col button button-block orange">Ultra Orange</button>
+          <button ng-click="updateReset()" class="col button button-block button-dark">Reset</button>
+          <button ng-click="updateOff()" class="col button button-dark button-block" >Off</button>
+        </div>
+        <ion-slide-box class="no-vmargin">
+          <ion-slide>
+            <div class="card">
+                <div class="row">
+                  <button ng-click="updateHS(0, 255)" class="col button button-block red">Red</button>
+                  <button ng-click="updateHS(120, 255)" class="col button button-block green">Green</button>
+                  <button ng-click="updateHS(240, 255)" class="col button button-block blue">Blue</button>
+                </div>
+                <div class="row">
+                  <button ng-click="updateHS(180, 255)" class="col button button-block cyan no-vmargin">Cyan</button>
+                  <button ng-click="updateHS(300, 255)" class="col button button-block magenta no-vmargin">Magenta</button>
+                  <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
+                </div>
+                <div class="row">
+                  <button ng-click="updateHS(340, 128)" class="col button button-block pink no-vmargin">Pink</button>
+                  <button ng-click="updateHS(30, 255)" class="col button button-block orange no-vmargin">Orange</button>
+                  <button ng-click="updateHS(240, 32)" class="col button button-block white no-vmargin">White</button>
+                </div>
+                <div class="row">
+                  <button ng-click="updateHSV(260, 192, 192)" class="col button button-block purple no-vmargin">Purple</button>
+                  <button ng-click="cycleHS([[240,255],[340,128]], 500)" class="col button button-block no-vmargin white">Blue/Pink</button>
+
+                </div>
             </div>
-          </div>
-           <div class="row">
-            <div class="item range range-positive row">
-              <i class="icon ion-paintbucket"></i>
-              <input ng-model="state.saturation" ng-change="sendUpdate()" type="range" name="volume" min="0" max="255" value="64">
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+                <div class="row">
+                  <button ng-click="updateHS(0, 255)" class="col button button-block red">Red</button>
+                  <button ng-click="updateHS(120, 200)" class="col button button-block green">Miku</button>
+                  <button ng-click="updateHS(240, 255)" class="col button button-block blue">Blue</button>
+                </div>
+                <div class="row">
+                  <button ng-click="updateHS(340, 128)" class="col button button-block pink no-vmargin">Pink</button>
+                  <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
+                  <button ng-click="updateHS(110, 255)" class="col button button-block no-vmargin green">Gumi</button>
+                </div>
+                <div class="row">
+                  <button ng-click="cycleHS([[340,128],[90,255]], 500)" class="col button button-block no-vmargin white">Gumi/Pink</button>
+                  <button ng-click="cycleHS([[120,200],[60,255]], 500)" class="col button button-block no-vmargin white">Green/Yellow</button>
+                </div>
+                <div class="row">
+                  <button ng-click="cycleHS([[60,255],[90,255]], 500)" class="col button button-block no-vmargin white">Gumi/Yellow</button>
+                  <button ng-click="cycleHS([[120,200],[340,128]], 500)" class="col button button-block no-vmargin white">Pink/Green</button>
+                </div>
             </div>
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+              <div class="row">
+                <button ng-click="cycleHS([[0,255],[240,100],[60,255],[240,255],[260,192],[120,255],[30,255]], 500)" class="col button button-block white">WUG</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(0, 255)" class="col button button-block red no-vmargin">Red</button>
+                <button ng-click="updateHS(120, 255)" class="col button button-block green no-vmargin">Green</button>
+                <button ng-click="updateHS(240, 255)" class="col button button-block blue no-vmargin">Blue</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(195, 63)" class="col button button-block cyan no-vmargin">L Blue</button>
+                <button ng-click="updateHS(300, 255)" class="col button button-block magenta no-vmargin">Purple</button>
+                <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(30, 255)" class="col button button-block orange no-vmargin">Orange</button>
+                <button ng-click="updateHS(340, 128)" class="col button button-block pink no-vmargin">Pink</button>
+                <button ng-click="updateHS(240, 32)" class="col button button-block white no-vmargin">White</button>
+              </div>
+            </div>
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+              <div class="row">
+                <button ng-click="cycleHS([[218,255],[30,255],[324,255],[340,128]], 500)" class="col button button-block white">iM@S</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(218, 255)" class="col button button-block blue no-vmargin">Navy</button>
+                <button ng-click="updateHS(30, 255)" class="col button button-block orange no-vmargin">Orange</button>
+                <button ng-click="updateHS(324, 255)" class="col button button-block magenta no-vmargin">Fuchsia</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(340, 128)" class="col button button-block pink no-vmargin">Pink</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(240, 32)" class="col button button-block white no-vmargin">White</button>
+              </div>
+            </div>
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+              <div class="row">
+                <button ng-click="cycleHS([[42,255],[209,157],[301,70],[240,32],[300,255],[60,255],[280,175],[120,128],[0,255]], 500)" class="col button button-block white">Aquors</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(42, 255)" class="col button button-block orange no-vmargin">V Orange</button>
+                <button ng-click="updateHS(209, 157)" class="col button button-block cyan no-vmargin">S Blue</button>
+                <button ng-click="updateHS(301, 70)" class="col button button-block magenta no-vmargin">S Magenta</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(240, 32)" class="col button button-block white no-vmargin">Gray</button>
+                <button ng-click="updateHS(300, 255)" class="col button button-block magenta no-vmargin">Magenta</button>
+                <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(280, 175)" class="col button button-block purple no-vmargin">Violet</button>
+                <button ng-click="updateHS(120, 128)" class="col button button-block green no-vmargin">L Green</button>
+                <button ng-click="updateHS(0, 255)" class="col button button-block red no-vmargin">Red</button>
+              </div>
+            </div>
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+              <div class="row">
+                <button ng-click="cycleHS([[0,255],[260,192],[60,255],[340,128],[120,255]], 500)" class="col button button-block white">Walküre</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(0, 255)" class="col button button-block no-vmargin red">Red</button>
+                <button ng-click="updateHS(260, 192)" class="col button button-block purple no-vmargin">Purple</button>
+                <button ng-click="updateHS(60, 255)" class="col button button-block yellow no-vmargin">Yellow</button>
+              </div>
+              <div class="row">
+                <button ng-click="updateHS(340, 128)" class="col button button-block pink no-vmargin">Pink</button>
+                <button ng-click="updateHS(120, 255)" class="col button button-block no-vmargin green">Green</button>
+              </div>
+              <div class="row">
+              </div>
+            </div>
+          </ion-slide>
+        </ion-slide-box>
+
+        <div class="row">
+          <div class="item range range-positive row">
+            <i class="icon ion-lightbulb"></i>
+            <input ng-model="state.brightness" ng-change="sendUpdate()" type="range" name="volume" min="0" max="255" value="64">
           </div>
-          <div class="row">
-            <button ng-click="updateHSV(260, 192, 192)" class="col button button-block purple">Purple</button>
-            <button ng-click="updateHSV(30,255,255)" class="col button button-block orange">Ultra Orange</button>
-            <button ng-click="updateReset()" class="col button button-block button-dark">Reset</button>
+        </div>
+        <!--
+         <div class="row">
+          <div class="item range range-positive row">
+            <i class="icon ion-paintbucket"></i>
+            <input ng-model="state.saturation" ng-change="sendUpdate()" type="range" name="volume" min="0" max="255" value="64">
           </div>
-          <div class="row">
-            <button ng-click="cycleHS([[0,255],[240,100],[60,255],[240,255],[260,192],[120,255],[30,255]], 500)" class="col button button-block white">WUG</button>
-            <button class="col button button-dark button-block" ng-click="updateOff()">Off</button>
-          </div>
-          <div class="row status">
-              <div class="col status">Status: {{ble.state}}</div>
-          </div>
+        </div>
+      -->
+        <div class="row status">
+            <div class="col status">Status: {{ble.state}}</div>
+        </div>
       </ion-content>
     </ion-pane>
     <script id="templates/ble-popover.html" type="text/ng-template">

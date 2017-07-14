@@ -1,0 +1,35 @@
+{
+  "name": "ng-rollbar",
+  "main": "ng-rollbar.js",
+  "version": "1.9.2",
+  "homepage": "https://github.com/tandibar/ng-rollbar",
+  "authors": [
+    "Andreas Bade <andreas.bade@identpro.de>"
+  ],
+  "description": "AngularJS integration for Rollbar",
+  "keywords": [
+    "rollbar",
+    "angular",
+    "angularjs",
+    "exception handling"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test",
+    "tests",
+    "Gruntfile",
+    "package.json"
+  ],
+  "_release": "1.9.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.9.2",
+    "commit": "529fd818335e1a29ffa1dd8eb3aa68711a7e38ca"
+  },
+  "_source": "https://github.com/tandibar/ng-rollbar.git",
+  "_target": "^1.9.2",
+  "_originalSource": "ng-rollbar",
+  "_direct": true
+}

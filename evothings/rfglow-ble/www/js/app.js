@@ -8,52 +8,84 @@ Ionic.io();
 // user.save();
 
 window.ionic.Platform.ready(function() {
-  //TestFairy.begin("e08d14885c1c81442f3329f9809554086920ff63");
-  StatusBar.hide();
+  //window.cordova.plugins.Rollbar.init();
+
   angular.bootstrap(document, ['rfglow-ble']);
-  blecontrol.initialize();
-})
 
-angular.module('rfglow-ble', ['ionic'])
+  if (!(typeof TestFairy === "undefined")) {
+    console.log("TestFairy is present");
+    //TestFairy.begin("e08d14885c1c81442f3329f9809554086920ff63");
+  }
 
-.run(function($ionicPlatform, $location, $rootScope) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if(window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    }
-    if(window.StatusBar) {
-      StatusBar.styleDefault();
-    }
-  });
-})
+  if (!(typeof Rollbar === "undefined")) {
+    console.log("Rollbar is present");
+  }
 
-.controller('RfglowCtrl', function($scope, $ionicModal) {
-  console.log("Checking Ionic Deploy");
-  var deploy = new Ionic.Deploy();
+  if (!(typeof StatusBar === "undefined")) {
+    console.log("StatusBar is present");
+    StatusBar.hide();
+  }
 
-  deploy.check().then(function(isDeployAvailable) {
-    // isDeployAvailable will be true if there is an update
-    // and false otherwise
-    if (isDeployAvailable) {
-      console.log("New Ionic Deploy update is available!");
-      deploy.update().then(function(deployResult) {
-        // deployResult will be true when successfull and
-        // false otherwise
-      }, function(deployUpdateError) {
-        // fired if we're unable to check for updates or if any
-        // errors have occured.
-      }, function(deployProgress) {
-        // this is a progress callback, so it will be called a lot
-        // deployProgress will be an Integer representing the current
-        // completion percentage.
-      });
-    }
-  }, function(deployCheckError) {
-    // unable to check for deploy updates
-    console.log("Error checking for Ionic Deploy update: "+deployCheckError);
-  });
+  if (!(typeof evothings.ble === "undefined")) {
+    console.log("EasyBLE is present");
+    blecontrol.initialize();
+  }
+
+});
+
+angular.module('rfglow-ble', ['ionic', 'ionic.cloud', 'tandibar/ng-rollbar'])
+
+  .config(function($ionicCloudProvider) {
+    $ionicCloudProvider.init({
+      "core": {
+        "app_id": "0ba1c21e"
+      }
+    });
+  })
+
+  .config(['RollbarProvider', function(RollbarProvider) {
+      RollbarProvider.init({
+      	accessToken: '47b865ea232f4c1389f6dbb30a3a4d7a',
+          captureUncaught: true,
+      	payload: {
+              environment: 'rfglow-ble'
+            }
+          });
+      console.log = Rollbar.info;
+  }])
+
+
+  .run(function($ionicPlatform, $location, $rootScope) {
+
+    $ionicPlatform.ready(function() {
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      if(window.cordova && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      }
+      if(window.StatusBar) {
+        StatusBar.styleDefault();
+      }
+    });
+  })
+
+  .controller('RfglowCtrl', function($scope, $ionicModal, $ionicDeploy) {
+    console.log("Checking Ionic Deploy");
+    var deploy = $ionicDeploy;
+    deploy.check().then(function(isDeployAvailable) {
+      // isDeployAvailable will be true if there is an update
+      // and false otherwise
+      if (isDeployAvailable) {
+        console.log("New Ionic Deploy update is available!");
+        deploy.download().then(function() {
+          console.log("New Ionic Deploy downloaded");
+          deploy.extract().then(function () {
+            console.log("New Ionic Deploy extracted");
+            deploy.load();
+          });
+        });
+      }
+    });
 
   console.log("RfglowCtrl init");
 
@@ -114,6 +146,7 @@ angular.module('rfglow-ble', ['ionic'])
 
   $scope.updateHS = function(h, s) {
     console.log("RFglowCtrl$scope updateHS");
+    $scope.state.cycle = false;
     $scope.state.hue = h;
     $scope.state.saturation = s;
     $scope.state.off = false;
@@ -122,6 +155,7 @@ angular.module('rfglow-ble', ['ionic'])
 
   $scope.updateHSV = function(h, s, v) {
     console.log("RFglowCtrl$scope updateHS");
+    $scope.state.cycle = false;
     $scope.state.hue = h;
     $scope.state.saturation = s;
     $scope.state.brightness = v;
@@ -135,11 +169,13 @@ angular.module('rfglow-ble', ['ionic'])
 
     var counter = 0;
     var looper = function() {
-      var index = counter%hsArray.length;
-      counter++;
-      $scope.updateHS(hsArray[index][0], hsArray[index][1]);
-      console.log("Cycle loop")
       if ($scope.state.cycle) {
+        var index = counter%hsArray.length;
+        counter++;
+        $scope.updateHS(hsArray[index][0], hsArray[index][1]);
+        $scope.state.cycle = true;
+        console.log("Cycle loop")
+
         setTimeout(looper, delayMs);
       } else {
         $scope.updateOff();
