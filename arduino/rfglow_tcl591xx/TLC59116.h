@@ -11,9 +11,6 @@
   - I think something that accumulates changes, then does them as a "block"
 */
 
-#define TLC59116_LOWLEVEL 1
-#define TLC59116_DEV 1
-
 #include <Arduino.h>
 #include <Wire.h> // Usage.Include+: You have to do this in your .ino also
 #include <avr/pgmspace.h> // Usage.Include+: You have to do this in your .ino also
