@@ -1,8 +1,7 @@
-#include <Wire.h>
 #include <avr/pgmspace.h> 
-#include <EEPROM.h>
+#include <HardwareSerial.h>
 
-#include <ClickButton.h>
+#include <OneButton.h>
 
 #include "cc1101.h"
 #include "calibration.h"
@@ -60,8 +59,9 @@ boolean packetAvailable = false;
 #define power_twi_enable()      (PRR &= (uint8_t)~(1 << PRTWI))
 #define power_twi_disable()     (PRR |= (uint8_t)(1 << PRTWI))
 
-// ClickButton Setup
-ClickButton button(4, LOW, CLICKBTN_PULLUP);
+// OneButton Setup
+OneButton button(4, true);
+//ClickButton button(4, LOW, CLICKBTN_PULLUP);
 
 void cc1101Interrupt(void) {
   packetAvailable = true;
@@ -91,10 +91,15 @@ void setup() {
   attachInterrupt(0, cc1101Interrupt, FALLING);
 
 
-  // Init ClickButton
+  // Init OneButton
+  button.attachClick(clickAction);
+  button.attachDoubleClick(doubleClickAction);
+  button.attachLongPressStart(longPressAction);
+  /*
   button.debounceTime = 20;
   button.multiclickTime = 85;
   button.longClickTime = 1000;
+  */
 
   // Init TLC59116
   tlcmanager.init();
@@ -146,29 +151,9 @@ void loop() {
     }
     attachInterrupt(0, cc1101Interrupt, FALLING);
   }
-  
-  button.Update();
-  
+
   if (curMs - lastCmdMs > RF_LOCKOUT_MS) {
-    if (button.clicks != 0) {
-      clickState = button.clicks;
-    }
-    
-    if (button.clicks == 1) {
-      isAutoCycle = false;
-      mH = (mH + 60) % 360;
-      setHSV(mH, mS, mB);
-    }
-    
-    if (button.clicks == 2) {
-      isAutoCycle = !isAutoCycle;
-    }
-    
-    if (button.clicks < 0) {
-      mB = (mB + 60) % 240;
-      setHSV(mH, mS, mB);
-    }
-    
+    button.tick();
     if (isAutoCycle) {
       if (curMs - prevMs > AUTO_INTERVAL) {
         mH = (mH + 60) % 360;
@@ -181,6 +166,21 @@ void loop() {
   }
 }
 
+void clickAction() {
+  isAutoCycle = false;
+  mH = (mH + 60) % 360;
+  setHSV(mH, mS, mB);
+}
+
+void doubleClickAction() {
+  isAutoCycle = !isAutoCycle;
+}
+
+void longPressAction() {
+  mB = (mB + 60) % 240;
+  setHSV(mH, mS, mB);
+}
+
 void processData(byte *data) {
 
   unsigned int hue;
@@ -190,12 +190,6 @@ void processData(byte *data) {
   hue = ((data[1] << 8) + data[2]);
   saturation = data[3];
   brightness = data[4];
-  
-/*
-  hue = ((data[1] << 8) + data[2]);
-  saturation = ((data[3] << 8) + data[4]);
-  brightness = ((data[5] << 8) + data[6]);
-*/
 
   DEBUG_PRINT("Received values: ");
   DEBUG_PRINT(hue);
