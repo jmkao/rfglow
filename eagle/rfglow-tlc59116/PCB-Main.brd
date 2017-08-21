@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.3.0">
+<eagle version="8.3.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -1209,6 +1209,11 @@ design rules under a new name.</description>
 <wire x1="-9.9875" y1="12.1105" x2="-9.398" y2="12.7" width="0.1524" layer="1"/>
 <wire x1="-9.398" y1="12.7" x2="-9.398" y2="13.769" width="0.1524" layer="1"/>
 <wire x1="-9.398" y1="13.769" x2="-9.424" y2="13.795" width="0.1524" layer="1"/>
+</signal>
+<signal name="N$8">
+<contactref element="U$1" pad="P$11"/>
+<contactref element="X1" pad="2"/>
+<wire x1="0.544" y1="1.524" x2="-7.324" y2="11.595" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>
