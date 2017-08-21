@@ -1,16 +1,14 @@
-#include <avr/pgmspace.h> 
+#include <avr/pgmspace.h>
 #include <HardwareSerial.h>
 
 #include <OneButton.h>
 
-#include "cc1101.h"
-#include "calibration.h"
-#include "panstamp.h"
+#include <cc1101.h>
+#include <panstamp.h>
 
 //#define TLC59116_LOWLEVEL 1
 //#define TLC59116_DEV 1
-
-#include "TLC59116.h"
+#include <TLC59116.h>
 
 // Logging Setup
 #define DEBUG
