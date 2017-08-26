@@ -1,10 +1,10 @@
 #include <avr/pgmspace.h>
-#include <HardwareSerial.h>
+#include "HardwareSerial.h"
 
 #include <OneButton.h>
 
-#include <cc1101.h>
-#include <panstamp.h>
+//#include <cc1101.h>
+//#include <panstamp.h>
 
 //#define TLC59116_LOWLEVEL 1
 //#define TLC59116_DEV 1
@@ -28,11 +28,6 @@ TLC59116Manager tlcmanager;
 TLC59116* driver = NULL;
 
 // CC1101 Setup
-#define RFCHANNEL 2
-byte networkAddress[] = {39,0};
-byte receiverAddress = 5;
-//byte syncWord[] = {39,39};
-CC1101 cc1101;
 boolean packetAvailable = false;
 
 // Power saving #defines
@@ -58,7 +53,7 @@ boolean packetAvailable = false;
 #define power_twi_disable()     (PRR |= (uint8_t)(1 << PRTWI))
 
 // OneButton Setup
-OneButton button(4, true);
+OneButton button(19, true);
 //ClickButton button(4, LOW, CLICKBTN_PULLUP);
 
 void cc1101Interrupt(void) {
@@ -67,32 +62,31 @@ void cc1101Interrupt(void) {
 
 void setup() {
   
+  #ifdef DEBUG
+    Serial.begin(38400);
+    Serial.println("Startup serial");
+  #endif
+  DEBUG_PRINTLN("TCL591XX Test");
+  DEBUG_PRINTLN("setup()");
+
   power_adc_disable();
   //power_timer0_disable();
   power_timer1_disable();
   power_timer2_disable();
   
-
-  
-  #ifdef DEBUG
-    Serial.begin(38400);
-  #endif
-  DEBUG_PRINTLN("TCL591XX Test");
-  DEBUG_PRINTLN("setup()");
-
   // Init CC1101
-  cc1101.setTxPowerAmp(0x03);
-  cc1101.init();
-  configRadio();
-  cc1101.disableAddressCheck();
-  cc1101.setRxState();
+  //cc1101.reset();
+  panstamp.cc1101.setTxPowerAmp(0x03);
+  //configRadio();
+  panstamp.cc1101.disableAddressCheck();
+  panstamp.cc1101.setRxState();
   attachInterrupt(0, cc1101Interrupt, FALLING);
-
 
   // Init OneButton
   button.attachClick(clickAction);
   button.attachDoubleClick(doubleClickAction);
   button.attachLongPressStart(longPressAction);
+  button.setClickTicks(150);
   /*
   button.debounceTime = 20;
   button.multiclickTime = 85;
@@ -119,7 +113,7 @@ void setup() {
 
 }
 
-#define RF_LOCKOUT_MS 2500
+#define RF_LOCKOUT_MS 4000
 unsigned long lastCmdMs = 0;
 
 unsigned int mH = 0;
@@ -142,7 +136,7 @@ void loop() {
     
     detachInterrupt(0);
     
-    if(cc1101.receiveData(&packet) > 0) {
+    if(panstamp.cc1101.receiveData(&packet) > 0) {
       if (packet.crc_ok && packet.length > 1) {
         processData(packet.data);
       }
@@ -165,16 +159,19 @@ void loop() {
 }
 
 void clickAction() {
+  DEBUG_PRINTLN("Single click");
   isAutoCycle = false;
   mH = (mH + 60) % 360;
   setHSV(mH, mS, mB);
 }
 
 void doubleClickAction() {
+  DEBUG_PRINTLN("Double click");
   isAutoCycle = !isAutoCycle;
 }
 
 void longPressAction() {
+  DEBUG_PRINTLN("Long press");
   mB = (mB + 60) % 240;
   setHSV(mH, mS, mB);
 }
@@ -189,12 +186,7 @@ void processData(byte *data) {
   saturation = data[3];
   brightness = data[4];
 
-  DEBUG_PRINT("Received values: ");
-  DEBUG_PRINT(hue);
-  DEBUG_PRINT(", ");
-  DEBUG_PRINT(saturation);
-  DEBUG_PRINT(", ");
-  DEBUG_PRINTLN(brightness);
+  DEBUG_PRINTLN("Received values: "+hue+", "+saturation+", "+brightness);
 
   setHSV(hue, saturation, brightness);
   
@@ -281,6 +273,7 @@ void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
   }
 }
 
+/*
 void configRadio() {
   // settings for 4.8kbps variable packet size
   
@@ -331,6 +324,7 @@ void configRadio() {
   cc1101.writeReg(CC1101_TEST1,0x35);   //Various Test Settings
   cc1101.writeReg(CC1101_TEST0,0x09);   //Various Test Settings
 }
+*/
 
 /*
 // Serial test version
