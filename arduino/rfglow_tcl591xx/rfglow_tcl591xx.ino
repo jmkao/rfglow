@@ -6,12 +6,12 @@
 //#include <cc1101.h>
 //#include <panstamp.h>
 
-//#define TLC59116_LOWLEVEL 1
-//#define TLC59116_DEV 1
+#define TLC59116_LOWLEVEL 0
+#define TLC59116_DEV 0
 #include <TLC59116.h>
 
 // Logging Setup
-#define DEBUG
+//#define DEBUG
 
 String log_prefix = String("RFG: ");
 
