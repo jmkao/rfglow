@@ -120,6 +120,8 @@ unsigned int mH = 0;
 unsigned int mS = 255;
 unsigned int mB = 60;
 
+unsigned int ma = 120;
+
 int clickState = 0;
 
 #define AUTO_INTERVAL 100
@@ -203,7 +205,34 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
   DEBUG_PRINTLN("setHSVRaw() called: "+h+" "+s+" "+v);
   
   unsigned char r, g, b;
-  unsigned char region, remainder, p, q, t;
+  unsigned char region, remainder, p, q, t, maLevel, newMa;
+
+  maLevel = h / 360;
+  h = h % 360;
+
+
+  switch (maLevel) {
+    case 1:
+      newMa = 90;
+      break;
+    case 2:
+      newMa = 60;
+      break;
+    case 3:
+      newMa = 30;
+      break;
+    default:
+      newMa = 120;
+  }
+
+  if (v == 0) {
+    newMa = 0;
+  }
+
+  if (newMa != ma) {
+    driver->set_milliamps(newMa);
+    ma = newMa;
+  }
 
   if (s == 0) {
     r = v;
