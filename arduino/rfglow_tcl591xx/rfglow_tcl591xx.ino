@@ -60,6 +60,21 @@ void cc1101Interrupt(void) {
   packetAvailable = true;
 }
 
+#define RF_LOCKOUT_MS 4000
+unsigned long lastCmdMs = 0;
+
+unsigned int mH = 0;
+unsigned int mS = 255;
+unsigned int mB = 60;
+
+unsigned int ma = 41;
+
+int clickState = 0;
+
+#define AUTO_INTERVAL 100
+boolean isAutoCycle = false;
+unsigned long prevMs = 0;
+
 void setup() {
   
   #ifdef DEBUG
@@ -99,6 +114,7 @@ void setup() {
   //sleepDriver(false);
   driver = &(tlcmanager[0]);
   driver->enable_outputs(true);
+  driver->set_milliamps(ma);
   
   
   driver->pattern(0b1100000000000000);
@@ -112,21 +128,6 @@ void setup() {
   driver->enable_outputs(false);  
 
 }
-
-#define RF_LOCKOUT_MS 4000
-unsigned long lastCmdMs = 0;
-
-unsigned int mH = 0;
-unsigned int mS = 255;
-unsigned int mB = 60;
-
-unsigned int ma = 120;
-
-int clickState = 0;
-
-#define AUTO_INTERVAL 100
-boolean isAutoCycle = false;
-unsigned long prevMs = 0;
 
 void loop() {
   
@@ -210,16 +211,17 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
   maLevel = h / 360;
   h = h % 360;
 
+  DEBUG_PRINTLN("maLevel = "+maLevel+", h = "+h);
 
   switch (maLevel) {
     case 1:
-      newMa = 90;
+      newMa = 61;
       break;
     case 2:
-      newMa = 60;
+      newMa = 21;
       break;
     case 3:
-      newMa = 30;
+      newMa = 10;
       break;
     default:
       newMa = 120;
@@ -231,9 +233,41 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
 
   if (newMa != ma) {
     driver->set_milliamps(newMa);
+    DEBUG_PRINTLN("set_milliamps to "+newMa);
     ma = newMa;
   }
 
+  unsigned int tempH = h*96/45;
+  uint8_t tempS = s;
+  uint8_t tempV = v;
+
+  uint8_t temp[5];
+  uint8_t n = (tempH >> 8);
+  //DEBUG_PRINTLN("Converted hue = "+tempH+" Color wheel section = "+n);
+  temp[0] = temp[3] = (uint8_t)((                                        (tempS ^ 255)  * tempV) / 255);
+  temp[1] = temp[4] = (uint8_t)((((( (tempH & 255)        * tempS) / 255) + (tempS ^ 255)) * tempV) / 255);
+  temp[2] =          (uint8_t)(((((((tempH & 255) ^ 255) * tempS) / 255) + (tempS ^ 255)) * tempV) / 255);
+  r  = temp[n + 2];
+  g = temp[n + 1];
+  b  = temp[n    ];
+
+//  uint8_t temp[5], n = (tempH >> 8) % 3;
+//  // %3 not needed if input is constrained, but may be useful for color cycling and/or if modulo constant is fast
+//
+//  uint8_t x = ((((tempH & 255) * s) >> 8) * v) >> 8;
+//  // shifts may be added for added speed and precision at the end if fast 32 bit calculation is available
+//  
+//  uint8_t y = ((256 - s) * v) >> 8;
+//  temp[0] = temp[3] =              y;
+//  temp[1] = temp[4] =          x + y;
+//  temp[2] =           v - x    ;
+//  r = temp[n + 2];
+//  g = temp[n + 1];
+//  b = temp[n    ];
+
+
+  /*
+  // Replae this with adafruits constant brightness code
   if (s == 0) {
     r = v;
     g = v;
@@ -267,6 +301,7 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
           break;
     }
   }
+  */
   setRGBRaw(r, g, b);
 }
 
