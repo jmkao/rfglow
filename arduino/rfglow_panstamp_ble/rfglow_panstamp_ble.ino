@@ -10,7 +10,7 @@
 
 #include "BluefruitConfig.h"
 
-#define DEBUG
+//#define DEBUG
 String log_prefix = String("RFG: ");
 #ifdef DEBUG
   #define DEBUG_PRINTLN(x) Serial.println (log_prefix + x)
@@ -29,16 +29,15 @@ Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_SCK, BLUEFRUIT_SPI_MISO,
 #define SENDS_ON_CHANGE 4
 #define PERIODIC_RESEND_MS 1000
 
-// This isn't actually used since rfglow_tcl591xx does disableAddressCheck()
-#define CC1101_RECV_ADDR 5
+#define CC1101_RECV_ADDR CC1101_DEFVAL_ADDR
 
 unsigned long previousMs = 0;
 unsigned int sends = 255;
 unsigned int c_hue = 0, c_saturation = 0, c_brightness = 0;
 
 void setup() {
-  pinMode(15, OUTPUT);
-  digitalWrite(15, HIGH);
+  //pinMode(15, OUTPUT);
+  //digitalWrite(15, HIGH);
 
   panstamp.radio.enableHGM();
   panstamp.setHighTxPower();

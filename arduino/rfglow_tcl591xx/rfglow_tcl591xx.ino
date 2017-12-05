@@ -67,7 +67,7 @@ unsigned int mH = 0;
 unsigned int mS = 255;
 unsigned int mB = 60;
 
-unsigned int ma = 41;
+unsigned int ma = 61;
 
 int clickState = 0;
 
@@ -93,7 +93,8 @@ void setup() {
   //cc1101.reset();
   panstamp.cc1101.setTxPowerAmp(0x03);
   //configRadio();
-  panstamp.cc1101.disableAddressCheck();
+  //panstamp.cc1101.disableAddressCheck();
+  //panstamp.cc1101.setDevAddress(CC1101_DEFVAL_ADDR);
   panstamp.cc1101.setRxState();
   attachInterrupt(0, cc1101Interrupt, FALLING);
 
@@ -184,12 +185,17 @@ void processData(byte *data) {
   unsigned int hue;
   unsigned int saturation;
   unsigned int brightness;
+  //boolean crc = data[5] >> 7;
 
   hue = ((data[1] << 8) + data[2]);
   saturation = data[3];
   brightness = data[4];
 
-  DEBUG_PRINTLN("Received values: "+hue+", "+saturation+", "+brightness);
+//  if (!crc) {
+//    DEBUG_PRINTLN("CRC failed. Ignoring packet. Data was: "+data[5]);
+//    return;
+//  }
+  DEBUG_PRINTLN("Received values: "+data[0]+", "+hue+", "+saturation+", "+brightness);
 
   setHSV(hue, saturation, brightness);
   
@@ -197,7 +203,7 @@ void processData(byte *data) {
 }
 
 void setHSV(unsigned int h, unsigned int s, unsigned int v) {
-  DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
+  //DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
   setHSVRaw(h,s,v);
 }
 
@@ -211,7 +217,7 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
   maLevel = h / 360;
   h = h % 360;
 
-  DEBUG_PRINTLN("maLevel = "+maLevel+", h = "+h);
+  //DEBUG_PRINTLN("maLevel = "+maLevel+", h = "+h);
 
   switch (maLevel) {
     case 1:
@@ -237,71 +243,59 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
     ma = newMa;
   }
 
-  unsigned int tempH = h*96/45;
-  uint8_t tempS = s;
-  uint8_t tempV = v;
 
-  uint8_t temp[5];
-  uint8_t n = (tempH >> 8);
-  //DEBUG_PRINTLN("Converted hue = "+tempH+" Color wheel section = "+n);
-  temp[0] = temp[3] = (uint8_t)((                                        (tempS ^ 255)  * tempV) / 255);
-  temp[1] = temp[4] = (uint8_t)((((( (tempH & 255)        * tempS) / 255) + (tempS ^ 255)) * tempV) / 255);
-  temp[2] =          (uint8_t)(((((((tempH & 255) ^ 255) * tempS) / 255) + (tempS ^ 255)) * tempV) / 255);
-  r  = temp[n + 2];
-  g = temp[n + 1];
-  b  = temp[n    ];
-
-//  uint8_t temp[5], n = (tempH >> 8) % 3;
-//  // %3 not needed if input is constrained, but may be useful for color cycling and/or if modulo constant is fast
-//
-//  uint8_t x = ((((tempH & 255) * s) >> 8) * v) >> 8;
-//  // shifts may be added for added speed and precision at the end if fast 32 bit calculation is available
-//  
-//  uint8_t y = ((256 - s) * v) >> 8;
-//  temp[0] = temp[3] =              y;
-//  temp[1] = temp[4] =          x + y;
-//  temp[2] =           v - x    ;
-//  r = temp[n + 2];
-//  g = temp[n + 1];
-//  b = temp[n    ];
-
-
-  /*
-  // Replae this with adafruits constant brightness code
-  if (s == 0) {
-    r = v;
-    g = v;
-    b = v;
-  } else {
-    region = h / 60;
-    remainder = (h - (region * 60)) * 6; 
-
-    p = (v * (255 - s)) >> 8;
-    q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-    t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
-
-    switch (region) {
-      case 0:
-          r = v; g = t; b = p;
-          break;
-      case 1:
-          r = q; g = v; b = p;
-          break;
-      case 2:
-          r = p; g = v; b = t;
-          break;
-      case 3:
-          r = p; g = q; b = v;
-          break;
-      case 4:
-          r = t; g = p; b = v;
-          break;
-      default:
-          r = v; g = p; b = q;
-          break;
+  if (ma == 120) {
+    // Max possible brightness across multiple LEDs if at max power
+    if (s == 0) {
+      r = v;
+      g = v;
+      b = v;
+    } else {
+      region = h / 60;
+      remainder = (h - (region * 60)) * 6; 
+  
+      p = (v * (255 - s)) >> 8;
+      q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+      t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+  
+      switch (region) {
+        case 0:
+            r = v; g = t; b = p;
+            break;
+        case 1:
+            r = q; g = v; b = p;
+            break;
+        case 2:
+            r = p; g = v; b = t;
+            break;
+        case 3:
+            r = p; g = q; b = v;
+            break;
+        case 4:
+            r = t; g = p; b = v;
+            break;
+        default:
+            r = v; g = p; b = q;
+            break;
+      }
     }
+  } else {
+    // otherwise maintain constant brightness
+    unsigned int tempH = h*96/45;
+    uint8_t tempS = s;
+    uint8_t tempV = v;
+  
+    uint8_t temp[5];
+    uint8_t n = (tempH >> 8);
+    //DEBUG_PRINTLN("Converted hue = "+tempH+" Color wheel section = "+n);
+    temp[0] = temp[3] = (uint8_t)((                                        (tempS ^ 255)  * tempV) / 255);
+    temp[1] = temp[4] = (uint8_t)((((( (tempH & 255)        * tempS) / 255) + (tempS ^ 255)) * tempV) / 255);
+    temp[2] =          (uint8_t)(((((((tempH & 255) ^ 255) * tempS) / 255) + (tempS ^ 255)) * tempV) / 255);
+    r  = temp[n + 2];
+    g = temp[n + 1];
+    b  = temp[n    ];
   }
-  */
+  
   setRGBRaw(r, g, b);
 }
 
