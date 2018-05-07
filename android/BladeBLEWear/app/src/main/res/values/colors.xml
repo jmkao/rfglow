@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="kb_red">#ff0000</color>
+    <color name="kb_green">#00ff00</color>
+    <color name="kb_blue">#0000ff</color>
+    <color name="kb_cyan">#00ffff</color>
+    <color name="kb_magenta">#ff00ff</color>
+    <color name="kb_yellow">#ffff00</color>
+</resources>
