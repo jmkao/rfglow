@@ -139,5 +139,6 @@ gradle-app.setting
 # End of https://www.gitignore.io/api/android,intellij,gradle
 
 /.idea/modules.xml
+/.idea/caches
 
 .DS_Store
