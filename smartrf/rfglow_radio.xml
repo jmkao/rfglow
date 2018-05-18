@@ -5,6 +5,10 @@
     <Description>Saved configuration data</Description>
     <registersettings>
         <Register>
+            <Name>ADDR</Name>
+            <Value>0x05</Value>
+        </Register>
+        <Register>
             <Name>AGCCTRL2</Name>
             <Value>0x43</Value>
         </Register>
@@ -13,20 +17,16 @@
             <Value>0x40</Value>
         </Register>
         <Register>
-            <Name>FIFOTHR</Name>
-            <Value>0x47</Value>
-        </Register>
-        <Register>
             <Name>FOCCFG</Name>
             <Value>0x16</Value>
         </Register>
         <Register>
             <Name>FREQ0</Name>
-            <Value>0x3b</Value>
+            <Value>0x13</Value>
         </Register>
         <Register>
             <Name>FREQ1</Name>
-            <Value>0x31</Value>
+            <Value>0x3b</Value>
         </Register>
         <Register>
             <Name>FREQ2</Name>
@@ -57,6 +57,10 @@
             <Value>0x06</Value>
         </Register>
         <Register>
+            <Name>IOCFG2</Name>
+            <Value>0x2e</Value>
+        </Register>
+        <Register>
             <Name>MCSM0</Name>
             <Value>0x18</Value>
         </Register>
@@ -66,7 +70,7 @@
         </Register>
         <Register>
             <Name>MDMCFG3</Name>
-            <Value>0x83</Value>
+            <Value>0x93</Value>
         </Register>
         <Register>
             <Name>MDMCFG4</Name>
@@ -77,8 +81,24 @@
             <Value>0x8e</Value>
         </Register>
         <Register>
+            <Name>PKTCTRL0</Name>
+            <Value>0x44</Value>
+        </Register>
+        <Register>
             <Name>PKTCTRL1</Name>
-            <Value>0x07</Value>
+            <Value>0x0c</Value>
+        </Register>
+        <Register>
+            <Name>PKTLEN</Name>
+            <Value>0x06</Value>
+        </Register>
+        <Register>
+            <Name>SYNC0</Name>
+            <Value>0x6e</Value>
+        </Register>
+        <Register>
+            <Name>SYNC1</Name>
+            <Value>0x2c</Value>
         </Register>
         <Register>
             <Name>TEST0</Name>
@@ -97,10 +117,10 @@
         <Property name="m_chkRegView" role="44">2</Property>
         <Property name="m_chkCmdView" role="44">0</Property>
         <Property name="m_chkRfParameters" role="44">2</Property>
-        <Property name="m_cmbUserMode" role="46">0</Property>
+        <Property name="m_cmbUserMode" role="46">1</Property>
         <Property name="m_easyModeSettings" role="33">-1</Property>
         <Property name="m_typicalSettings" role="33">-1</Property>
-        <Property name="m_testFuncPanel" role="37">0</Property>
+        <Property name="m_testFuncPanel" role="37">2</Property>
     </dcpanel>
     <rfparameters>
         <Property name="Xtal Frequency" role="46">26.000000</Property>
