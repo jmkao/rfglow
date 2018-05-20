@@ -1,0 +1,16 @@
+{
+  "menus": {
+    "colorMenu": {
+      "buttons": [
+        {
+          "uiColor": "#FF0000",
+          "action": "changeHS(0, 255)"
+        },
+        {
+          "uiColor": "#00FF00",
+          "action": "changeHS(120, 255)"
+        }
+      ]
+    }
+  }
+}

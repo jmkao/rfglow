@@ -1,0 +1,13 @@
+{
+  "name": "firestore",
+  "version": "1.0.0",
+  "description": "Firestore Utils for BladeBLE",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "firestore-export-import": "^0.1.3",
+    "fs": "0.0.1-security"
+  }
+}
