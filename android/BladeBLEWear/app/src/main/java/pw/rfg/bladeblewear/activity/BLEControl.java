@@ -2,21 +2,20 @@ package pw.rfg.bladeblewear.activity;
 
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import pw.rfg.bladeblewear.R;
 import pw.rfg.bladeblewear.action.SpeedDialMasterListener;
-import pw.rfg.bladeblewear.util.ViewGroupUtil;
 
 public class BLEControl extends WearableActivity {
 
     private static final String TAG = "BLEControl";
 
     private View mEditColorButton;
-    private ViewGroup mMainMenu, mSubMenu;
+    private ViewGroup mMainMenu, mColorMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,14 +23,16 @@ public class BLEControl extends WearableActivity {
         setContentView(R.layout.activity_blecontrol);
 
         mMainMenu = findViewById(R.id.mainMenu);
-        mSubMenu = findViewById(R.id.colorMenu);
+        mColorMenu = findViewById(R.id.colorMenu);
 
         mEditColorButton = findViewById(R.id.editColorButton);
 
-        mEditColorButton.setOnTouchListener(new SpeedDialMasterListener(mMainMenu, mSubMenu));
+        mEditColorButton.setOnTouchListener(new SpeedDialMasterListener(mMainMenu, mColorMenu));
 
         // Enables Always-on
         setAmbientEnabled();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
     }
 
     @Override

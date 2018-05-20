@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "94746840295",
+    "firebase_url": "https://bladeble-e714e.firebaseio.com",
+    "project_id": "bladeble-e714e",
+    "storage_bucket": "bladeble-e714e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94746840295:android:b91b91b641b87f7c",
+        "android_client_info": {
+          "package_name": "pw.rfg.bladeblewear"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "94746840295-f36g4tj2i2p4pmnk4u8mvqt650eel180.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pw.rfg.bladeblewear",
+            "certificate_hash": "4dd15da5180918517e94e12f18e58bd741960511"
+          }
+        },
+        {
+          "client_id": "94746840295-mn42v30mavjnpaf4gsn5chfc0jhvla4g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvQ9N-l9TBOy9JC_Qmy1OXxHCC_jbuv60"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "94746840295-mn42v30mavjnpaf4gsn5chfc0jhvla4g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

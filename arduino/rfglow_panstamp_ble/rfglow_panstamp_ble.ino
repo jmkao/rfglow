@@ -10,7 +10,7 @@
 
 #include "BluefruitConfig.h"
 
-//#define DEBUG
+#define DEBUG
 String log_prefix = String("RFG: ");
 #ifdef DEBUG
   #define DEBUG_PRINTLN(x) Serial.println (log_prefix + x)
@@ -40,10 +40,11 @@ void setup() {
   //digitalWrite(15, HIGH);
 
   panstamp.radio.enableHGM();
+  panstamp.radio.setTxState();
   panstamp.setHighTxPower();
-
+  
   #ifdef DEBUG
-    Serial.begin(38400);
+    Serial.begin(115200);
     Serial.println("Startup serial");
   #endif
   DEBUG_PRINTLN("Panstamp NRF51 Test");
@@ -103,23 +104,20 @@ void loop() {
 }
 
 void rxCallback(uint8_t *buffer, uint16_t len) {
-  DEBUG_PRINT(F("Received "));
-  DEBUG_PRINT(len);
-  
-  DEBUG_PRINT(F(" bytes: "));
-  
-  for(int i=0; i<len; i++)
-   DEBUG_PRINT((char)buffer[i]); 
+  DEBUG_PRINTLN("Received "+len+"bytes...");
 
-  DEBUG_PRINT(F(" ["));
+//  for(int i=0; i<len; i++)
+//   DEBUG_PRINT((char)buffer[i]); 
 
-  for(int i=0; i<len; i++) {
-    DEBUG_PRINT(" 0x");
-    DEBUG_PRINT((char)buffer[i] + HEX); 
-  }
-  DEBUG_PRINT(F(" ]"));
-  
-  DEBUG_PRINTLN("");
+//  DEBUG_PRINT(F(" ["));
+
+//  for(int i=0; i<len; i++) {
+//    DEBUG_PRINT(" 0x");
+//    DEBUG_PRINT((char)buffer[i] + HEX); 
+//  }
+//  DEBUG_PRINT(F(" ]"));
+//  
+//  DEBUG_PRINTLN("");
 
   if (len == 4) {
     // 4 bytes means treat as 1 16-bit and 2 8-bit uints directly
@@ -127,12 +125,7 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
     c_saturation = buffer[2];
     c_brightness = buffer[3];
     sends = 0;
-    DEBUG_PRINT("Directly read: ");
-    DEBUG_PRINT(c_hue);
-    DEBUG_PRINT(", ");
-    DEBUG_PRINT(c_saturation);
-    DEBUG_PRINT(", ");
-    DEBUG_PRINTLN(c_brightness);
+    DEBUG_PRINTLN("Directly read: HSV=("+c_hue+"h, "+c_saturation+"s, "+c_brightness+"v)");
   } else if (len <= 11) {
     // safe number of bytes in the packet
     char inData[len+1];
@@ -172,6 +165,8 @@ void sendCurrentColor() {
 void sendCommand(uint16_t hue, uint8_t saturation, uint8_t brightness) {
   CCPACKET packet;
 
+  unsigned long startTime = micros();
+
   packet.length = 5;
   packet.data[0] = CC1101_RECV_ADDR;
   packet.data[1] = (hue >> 8) & 0xFF;
@@ -202,7 +197,8 @@ void sendCommand(uint16_t hue, uint8_t saturation, uint8_t brightness) {
   } else {
     DEBUG_PRINT("X");
   }
-  //digitalWrite(PA_EN_PIN, LOW);
+
+  DEBUG_PRINTLN("Send took " + (micros()-startTime) + " us");
 }
 
 boolean sendData(CCPACKET packet) {
