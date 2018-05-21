@@ -1,14 +1,26 @@
 {
   "menus": {
     "colorMenu": {
-      "buttons": [
+      "models": [
         {
+          "label": "Red",
           "uiColor": "#FF0000",
-          "action": "changeHS(0, 255)"
+          "action": "ble.changeHS(0, 255)"
         },
         {
+          "label": "Green",
           "uiColor": "#00FF00",
-          "action": "changeHS(120, 255)"
+          "action": "ble.changeHS(120, 255)"
+        },
+        {
+          "label": "Cyan",
+          "uiColor": "#00FFFF",
+          "action": "ble.changeHS(180, 255)"
+        },
+        {
+          "label": "Blue",
+          "uiColor": "#0000FF",
+          "action": "ble.changeHS(240, 255)"
         }
       ]
     }

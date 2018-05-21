@@ -1,4 +1,4 @@
-package pw.rfg.bladeblewear.action;
+package pw.rfg.bladeblewear.menu;
 
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -11,12 +11,25 @@ import pw.rfg.bladeblewear.util.ViewGroupUtil;
 public class SpeedDialMasterListener implements View.OnTouchListener {
     private static final String TAG = "SpeedDialMasterListener";
 
-    private ViewGroup topMenu, subMenu;
+    private ViewGroup parentMenu, subMenu;
 
     private View lastHover = null;
 
-    public SpeedDialMasterListener(ViewGroup topMenu, ViewGroup subMenu) {
-        this.topMenu = topMenu;
+    public static SpeedDialMasterListener assign(SubMenuModel subMenu, ViewGroup parentMenu) {
+        return assign(subMenu.getActivateButton(), parentMenu, subMenu.getMenu());
+    }
+
+    public static SpeedDialMasterListener assign(View button, ViewGroup parentMenu, ViewGroup subMenu) {
+        SpeedDialMasterListener listener
+                = new SpeedDialMasterListener(parentMenu, subMenu);
+
+        button.setOnTouchListener(listener);
+
+        return listener;
+    }
+
+    private SpeedDialMasterListener(ViewGroup parentMenu, ViewGroup subMenu) {
+        this.parentMenu = parentMenu;
         this.subMenu = subMenu;
     }
 
@@ -24,24 +37,24 @@ public class SpeedDialMasterListener implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.d(TAG, "DOWN touch action on topButton");
+                Log.v(TAG, "DOWN touch action on topButton");
                 v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                topMenu.setVisibility(View.INVISIBLE);
+                parentMenu.setVisibility(View.INVISIBLE);
                 subMenu.setVisibility(View.VISIBLE);
                 return true;
             case MotionEvent.ACTION_UP:
-                Log.d(TAG, "UP touch action on topButton");
-                View upView = ViewGroupUtil.findViewInXY(subMenu, event);
+                Log.v(TAG, "UP touch action on topButton");
+                View upView = ViewGroupUtil.findViewInMotion(subMenu, event);
                 if (upView != null) {
                     upView.performClick();
-                    Log.d(TAG, "subButton UP on "+upView.getTag());
+                    Log.v(TAG, "subButton UP on "+upView.getTag());
                 }
-                topMenu.setVisibility(View.VISIBLE);
+                parentMenu.setVisibility(View.VISIBLE);
                 subMenu.setVisibility(View.INVISIBLE);
                 return true;
             case MotionEvent.ACTION_MOVE:
                 //Log.v(TAG, "MOVE touch action on startButton");
-                View hoverView = ViewGroupUtil.findViewInXY(subMenu, event);
+                View hoverView = ViewGroupUtil.findViewInMotion(subMenu, event);
                 if (hoverView != null) {
                     //Log.v(TAG, "subMenu MOVE on "+hoverView.getTag());
                     hoverView.setPressed(true);
