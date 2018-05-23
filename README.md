@@ -8,9 +8,9 @@ There are 3 basic component areas:
  * Microcontroller code (Arduino code)
  * Plastic handle (Inventor IPT files and STL files for 3D printing)
 
-## Discussion Forum
+## Project Chat
 
-http://ost.io/@jmkao/rfglow
+[![Join the chat at https://gitter.im/rfglow/Lobby](https://badges.gitter.im/rfglow/Lobby.svg)](https://gitter.im/rfglow/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Status
 This project is fairly usable, although could use some additional polish. All of the areas are sufficiently functional to demonstrate a proof of concept, but requires more testing before a device could actually be used in a physically demanding environment.
