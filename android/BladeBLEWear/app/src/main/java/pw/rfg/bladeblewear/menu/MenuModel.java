@@ -1,17 +1,14 @@
 package pw.rfg.bladeblewear.menu;
 
 import android.support.design.widget.FloatingActionButton;
-import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
-import pw.rfg.bladeblewear.databinding.ActivityBlecontrolBinding;
+import pw.rfg.bladeblewear.databinding.ActivityMainBinding;
 
 public class MenuModel {
-    ActivityBlecontrolBinding binding;
+    ActivityMainBinding binding;
 
     public ViewGroup topMenu;
 
@@ -19,7 +16,7 @@ public class MenuModel {
 
     public HashMap<String, SubMenuModel> subMenus = new HashMap<>();
 
-    public MenuModel(ActivityBlecontrolBinding binding) {
+    public MenuModel(ActivityMainBinding binding) {
         this.binding = binding;
 
         topMenu = binding.mainMenu;

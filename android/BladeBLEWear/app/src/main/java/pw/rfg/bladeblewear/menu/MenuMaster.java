@@ -10,17 +10,17 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import pw.rfg.bladeblewear.databinding.ActivityBlecontrolBinding;
+import pw.rfg.bladeblewear.databinding.ActivityMainBinding;
 
 public class MenuMaster {
     private static final String TAG = "MenuMaster";
 
-    private ActivityBlecontrolBinding binding;
+    private ActivityMainBinding binding;
     private FirebaseFirestore db;
 
     private MenuModel menuModel;
 
-    public MenuMaster(ActivityBlecontrolBinding binding) {
+    public MenuMaster(ActivityMainBinding binding) {
         this.binding = binding;
         this.menuModel = new MenuModel(binding);
 

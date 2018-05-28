@@ -2,13 +2,16 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/black"
+        android:keepScreenOn="true"
         android:padding="@dimen/box_inset_layout_padding"
-        tools:context=".activity.BLEControl"
+        android:tag="layout/activity_main"
+        tools:context=".activity.MainActivity"
         tools:deviceIds="wear">
 
 
@@ -278,8 +281,8 @@
                 android:layout_marginStart="8dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:onClick="jexlButtonAction"
                 android:hapticFeedbackEnabled="true"
+                android:onClick="jexlButtonAction"
                 android:src="@drawable/action_item_icon_background"
                 android:tint="@color/black"
                 app:backgroundTint="@color/black"
@@ -300,8 +303,8 @@
                 android:layout_marginTop="8dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:onClick="jexlButtonAction"
                 android:hapticFeedbackEnabled="true"
+                android:onClick="jexlButtonAction"
                 android:src="@drawable/action_item_icon_background"
                 android:tint="@color/black"
                 app:backgroundTint="@color/black"
@@ -325,8 +328,8 @@
                 android:layout_marginTop="8dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:onClick="jexlButtonAction"
                 android:hapticFeedbackEnabled="true"
+                android:onClick="jexlButtonAction"
                 android:src="@drawable/action_item_icon_background"
                 android:tint="@color/black"
                 app:backgroundTint="@color/black"
