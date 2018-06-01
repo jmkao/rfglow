@@ -11,11 +11,11 @@
 #include <TLC59116.h>
 
 // Logging Setup
-//#define DEBUG
+#define RFG_DEBUG
 
 String log_prefix = String("RFG: ");
 
-#ifdef DEBUG
+#ifdef RFG_DEBUG
   #define DEBUG_PRINTLN(x) Serial.println (log_prefix + x)
   #define DEBUG_PRINT(x) Serial.print (log_prefix + x)
 #else
@@ -58,7 +58,20 @@ OneButton button(19, true);
 
 void cc1101Interrupt(void) {
   packetAvailable = true;
+  TCNT1 = 0; // Reset Interrupt counter 
 }
+
+unsigned long last_rx_time = 0;
+bool fhss_on = false;  // Syncronization flag with PTX (at setup time must be false)
+
+#define hopIntervalMicros 40000
+#define preHopMicros 10000
+unsigned long lastHopMicros = 0;
+boolean isInPreHop = false;
+byte fhss_schema[] = { 9, 1, 5, 6, 2, 3, 4, 0, 8, 7 };
+//byte fhss_schema[] = { 1 };
+byte ptr_fhss_schema = 0;
+unsigned int packets_received = 0;
 
 #define RF_LOCKOUT_MS 4000
 unsigned long lastCmdMs = 0;
@@ -77,24 +90,24 @@ unsigned long prevMs = 0;
 
 void setup() {
   
-  #ifdef DEBUG
-    Serial.begin(38400);
+  #ifdef RFG_DEBUG
+    Serial.begin(115200);
     Serial.println("Startup serial");
   #endif
   DEBUG_PRINTLN("TCL591XX Test");
-  DEBUG_PRINTLN("setup()");
+  //DEBUG_PRINTLN("setup()");
 
   power_adc_disable();
   //power_timer0_disable();
-  power_timer1_disable();
-  power_timer2_disable();
+  //power_timer1_disable();
+  //power_timer2_disable();
   
   // Init CC1101
-  //cc1101.reset();
   panstamp.cc1101.setTxPowerAmp(0x03);
-  //configRadio();
-  //panstamp.cc1101.disableAddressCheck();
-  //panstamp.cc1101.setDevAddress(CC1101_DEFVAL_ADDR);
+  panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]);
+
+  last_rx_time = micros();
+  
   panstamp.cc1101.setRxState();
   attachInterrupt(0, cc1101Interrupt, FALLING);
 
@@ -132,16 +145,62 @@ void setup() {
 
 void loop() {
   
+  if (!isInPreHop && micros() - lastHopMicros > hopIntervalMicros - preHopMicros) {    
+    if(fhss_on==true) {  // Only if we are synced with PTX and if it's time to perform channel change (10ms before expected data from PTX)
+      ptr_fhss_schema++;  // Increment pointer of fhss schema array to perform next channel change
+      if(ptr_fhss_schema >= sizeof(fhss_schema)) {
+        ptr_fhss_schema=0; // To avoid fhss schema array indexing overflow
+        //DEBUG_PRINTLN("Packets received: "+packets_received);
+        packets_received = 0;
+      }
+      panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]); // Change channel
+      isInPreHop = true;
+      
+      //DEBUG_PRINTLN("FHSS changed channel to: "+panstamp.cc1101.channel);
+      //DEBUG_PRINTLN("Hopped channel at: "+micros());
+    }
+  }
+
+  unsigned long currentMicros = micros();
   unsigned long curMs = millis();
+  
+  if (currentMicros - lastHopMicros > hopIntervalMicros) {
+    lastHopMicros = currentMicros;
+    isInPreHop = false;
+  }
+
+//  The following code serves to declare "out of sync" of the receiver if we don't receive data for a time needed to cover the entire channels sequency schema (plus a little extra delay)
+//  and change channel in case this one is pertrubated for a long time
+//  In this mode I'm able to resyncronize PTX and PRX in any case (Reset of PTX, reset of PRX, channels perturbation, ecc.) and very quickly
+  if((currentMicros - last_rx_time) > ((((sizeof(fhss_schema))+5)*hopIntervalMicros))) { 
+    DEBUG_PRINTLN("FHSS resync. Haven't seen data in micros: "+(currentMicros - last_rx_time));
+    //DEBUG_PRINTLN("FHSS resync.");
+    last_rx_time = micros();
+    fhss_on=false;
+    ptr_fhss_schema++;
+    if(ptr_fhss_schema >= sizeof(fhss_schema)) {
+      ptr_fhss_schema=0;
+    }
+    panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]);
+  }
+
   
   if(packetAvailable) {
     packetAvailable = false;
+
+    fhss_on=true; // Now we can follow the fhss schema (we are synced with PTX channel and with interrupt time of PTX)
+    last_rx_time = micros();  // Update received time
+    lastHopMicros = last_rx_time - preHopMicros;
+    //DEBUG_PRINTLN("Received packet at: "+last_rx_time);
+
     CCPACKET packet;
     
     detachInterrupt(0);
     
     if(panstamp.cc1101.receiveData(&packet) > 0) {
       if (packet.crc_ok && packet.length > 1) {
+        //DEBUG_PRINTLN("Received packet on channel "+panstamp.cc1101.channel);
+        packets_received++;
         processData(packet.data);
       }
     }
@@ -195,7 +254,7 @@ void processData(byte *data) {
 //    DEBUG_PRINTLN("CRC failed. Ignoring packet. Data was: "+data[5]);
 //    return;
 //  }
-  DEBUG_PRINTLN("Received values: "+data[0]+", "+hue+", "+saturation+", "+brightness);
+  //DEBUG_PRINTLN("Received values: "+data[0]+", "+hue+", "+saturation+", "+brightness);
 
   setHSV(hue, saturation, brightness);
   
@@ -209,7 +268,7 @@ void setHSV(unsigned int h, unsigned int s, unsigned int v) {
 
 void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
   
-  DEBUG_PRINTLN("setHSVRaw() called: "+h+" "+s+" "+v);
+  //DEBUG_PRINTLN("setHSVRaw() called: "+h+" "+s+" "+v);
   
   unsigned char r, g, b;
   unsigned char region, remainder, p, q, t, maLevel, newMa;
@@ -239,7 +298,7 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
 
   if (newMa != ma) {
     driver->set_milliamps(newMa);
-    DEBUG_PRINTLN("set_milliamps to "+newMa);
+    //DEBUG_PRINTLN("set_milliamps to "+newMa);
     ma = newMa;
   }
 
@@ -300,7 +359,7 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
 }
 
 void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
-  DEBUG_PRINTLN("setRGBRaw() called: "+r+" "+g+" "+b);
+  //DEBUG_PRINTLN("setRGBRaw() called: "+r+" "+g+" "+b);
   
   if (r==0 & g==0 & b==0) {
     driver->pattern(0x0000);
@@ -330,102 +389,4 @@ void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
     driver->set_outputs(leds);
   }
 }
-
-/*
-void configRadio() {
-  // settings for 4.8kbps variable packet size
-  
-  cc1101.writeReg(CC1101_IOCFG2,0x29);  //GDO2 Output Pin Configuration
-  cc1101.writeReg(CC1101_IOCFG1,0x2E);  //GDO1 Output Pin Configuration
-  cc1101.writeReg(CC1101_IOCFG0,0x06);  //GDO0 Output Pin Configuration
-  cc1101.writeReg(CC1101_FIFOTHR,0x47); //RX FIFO and TX FIFO Thresholds
-  cc1101.writeReg(CC1101_SYNC1,0xD3);   //Sync Word, High Byte
-  cc1101.writeReg(CC1101_SYNC0,0x91);   //Sync Word, Low Byte
-  cc1101.writeReg(CC1101_PKTLEN,0xFF);  //Packet Length
-  cc1101.writeReg(CC1101_PKTCTRL1,0x07);//Packet Automation Control
-  cc1101.writeReg(CC1101_PKTCTRL0,0x45);//Packet Automation Control
-  cc1101.writeReg(CC1101_CHANNR,0x00);  //Channel Number
-  cc1101.writeReg(CC1101_FSCTRL1,0x06); //Frequency Synthesizer Control
-  cc1101.writeReg(CC1101_FSCTRL0,0x00); //Frequency Synthesizer Control
-  cc1101.writeReg(CC1101_FREQ2,0x23);   //Frequency Control Word, High Byte
-  cc1101.writeReg(CC1101_FREQ1,0x31);   //Frequency Control Word, Middle Byte
-  cc1101.writeReg(CC1101_FREQ0,0x3B);   //Frequency Control Word, Low Byte
-  cc1101.writeReg(CC1101_MDMCFG4,0xC7); //Modem Configuration
-  cc1101.writeReg(CC1101_MDMCFG3,0x83); //Modem Configuration
-  cc1101.writeReg(CC1101_MDMCFG2,0x03); //Modem Configuration
-  cc1101.writeReg(CC1101_MDMCFG1,0x22); //Modem Configuration
-  cc1101.writeReg(CC1101_MDMCFG0,0xF8); //Modem Configuration
-  cc1101.writeReg(CC1101_DEVIATN,0x40); //Modem Deviation Setting
-  cc1101.writeReg(CC1101_MCSM2,0x07);   //Main Radio Control State Machine Configuration
-  cc1101.writeReg(CC1101_MCSM1,0x30);   //Main Radio Control State Machine Configuration
-  cc1101.writeReg(CC1101_MCSM0,0x18);   //Main Radio Control State Machine Configuration
-  cc1101.writeReg(CC1101_FOCCFG,0x16);  //Frequency Offset Compensation Configuration
-  cc1101.writeReg(CC1101_BSCFG,0x6C);   //Bit Synchronization Configuration
-  cc1101.writeReg(CC1101_AGCCTRL2,0x43);//AGC Control
-  cc1101.writeReg(CC1101_AGCCTRL1,0x40);//AGC Control
-  cc1101.writeReg(CC1101_AGCCTRL0,0x91);//AGC Control
-  cc1101.writeReg(CC1101_WOREVT1,0x87); //High Byte Event0 Timeout
-  cc1101.writeReg(CC1101_WOREVT0,0x6B); //Low Byte Event0 Timeout
-  cc1101.writeReg(CC1101_WORCTRL,0xF8); //Wake On Radio Control
-  cc1101.writeReg(CC1101_FREND1,0x56);  //Front End RX Configuration
-  cc1101.writeReg(CC1101_FREND0,0x10);  //Front End TX Configuration
-  cc1101.writeReg(CC1101_FSCAL3,0xE9);  //Frequency Synthesizer Calibration
-  cc1101.writeReg(CC1101_FSCAL2,0x2A);  //Frequency Synthesizer Calibration
-  cc1101.writeReg(CC1101_FSCAL1,0x00);  //Frequency Synthesizer Calibration
-  cc1101.writeReg(CC1101_FSCAL0,0x1F);  //Frequency Synthesizer Calibration
-  cc1101.writeReg(CC1101_RCCTRL1,0x41); //RC Oscillator Configuration
-  cc1101.writeReg(CC1101_RCCTRL0,0x00); //RC Oscillator Configuration
-  cc1101.writeReg(CC1101_FSTEST,0x59);  //Frequency Synthesizer Calibration Control
-  cc1101.writeReg(CC1101_PTEST,0x7F);   //Production Test
-  cc1101.writeReg(CC1101_AGCTEST,0x3F); //AGC Test
-  cc1101.writeReg(CC1101_TEST2,0x81);   //Various Test Settings
-  cc1101.writeReg(CC1101_TEST1,0x35);   //Various Test Settings
-  cc1101.writeReg(CC1101_TEST0,0x09);   //Various Test Settings
-}
-*/
-
-/*
-// Serial test version
-void loop() {
-  static char inData[80];
-  static byte index = 0;
-
-  while (Serial.available() > 0) {
-    char aChar = Serial.read();
-    if (aChar == '\n') {
-      // Turn inData into a \0 terminated string
-      inData[index] = 0;
-
-      Serial.print("Confirmed ");
-      Serial.print(inData);
-      Serial.print(". "); 
-      
-      // Parse the line
-      int channel, value;
-      int numExtracted = sscanf(inData,"%u %u",&channel,&value);
-      Serial.print(" # values = ");
-      Serial.println(numExtracted);
-      if (numExtracted == 2) {
-        if (channel == 16) {
-          if (!value) {
-            driver->enable_outputs(false);
-          } else {
-
-          }
-        } else {
-          driver->enable_outputs(true);
-          driver->pwm(channel, value);
-        }
-      }
-      
-      // Reset index
-      index = 0;
-      Serial.println("ready, enter 2 space separated numbers like 0 255 for channel brightness");
-    } else {
-      inData[index] = aChar;
-      index++;
-    }
-  }
-}
-*/
 

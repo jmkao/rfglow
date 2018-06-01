@@ -31,6 +31,16 @@ Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_SCK, BLUEFRUIT_SPI_MISO,
 
 #define CC1101_RECV_ADDR CC1101_DEFVAL_ADDR
 
+#define hopIntervalMicros 40000
+#define preHopMicros 10000
+bool isInPreHop = false;
+unsigned long lastSendMicros = 0;
+byte fhss_schema[] = { 9, 1, 5, 6, 2, 3, 4, 0, 8, 7 };
+//byte fhss_schema[] = { 1 };
+byte ptr_fhss_schema = 0;
+
+unsigned int packets_sent = 0;
+
 unsigned long previousMs = 0;
 unsigned int sends = 255;
 unsigned int c_hue = 0, c_saturation = 0, c_brightness = 0;
@@ -42,24 +52,22 @@ void setup() {
   panstamp.radio.enableHGM();
   panstamp.radio.setTxState();
   panstamp.setHighTxPower();
-  
+  panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]);
+
   #ifdef DEBUG
     Serial.begin(115200);
     Serial.println("Startup serial");
   #endif
-  DEBUG_PRINTLN("Panstamp NRF51 Test");
-  DEBUG_PRINTLN("setup()");
   
   if ( !ble.begin(VERBOSE_MODE) ) {
     DEBUG_PRINTLN(F("Couldn't find Bluefruit, make sure it's in CoMmanD mode & check wiring?"));
   }
   DEBUG_PRINTLN( F("OK!") );
-
 //  if (!ble.factoryReset()) {
 //    DEBUG_PRINTLN("Couldn't factory reset");
 //  }
 
-  ble.info();
+  //ble.info();
   ble.sendCommandCheckOK("AT+GAPDEVNAME=RFGLOW");
   ble.sendCommandCheckOK("ATZ");
   ble.sendCommandCheckOK("AT+GAPCONNECTABLE=1");
@@ -70,10 +78,34 @@ void setup() {
   //ble.setDisconnectCallback(disconnectCallback);
   
   ble.setMode(BLUEFRUIT_MODE_DATA);
+
+  lastSendMicros = micros();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly
+
+  // FHSS interrupt processing
+  if(!isInPreHop && micros() - lastSendMicros > hopIntervalMicros - preHopMicros) {
+    ptr_fhss_schema++;  // Increment pointer of fhss schema array to perform next channel change
+    if(ptr_fhss_schema >= sizeof(fhss_schema)) {
+      ptr_fhss_schema=0; // To avoid array indexing overflow
+      DEBUG_PRINTLN("Packets sent: "+packets_sent);
+      packets_sent = 0;
+    }
+    panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]); // Change channel
+    isInPreHop = true;
+  }
+
+  unsigned long currentMicros = micros();
+
+  // Send only if Int_TX_cnt number of interrupts have been fired
+  if (currentMicros - lastSendMicros > hopIntervalMicros) {
+    sendCurrentColor();
+    lastSendMicros = currentMicros;
+    DEBUG_PRINTLN("Sent at: "+currentMicros);
+    isInPreHop = false;
+  }
+  
   if (ble.available()) {
     uint8_t buffer[4];
     int len;
@@ -81,10 +113,12 @@ void loop() {
     rxCallback(buffer, len);
   }
 
-  unsigned long currentMs = millis();
+
+
   
   // Only check for a pending update if more than LED_UPDATE_INTERVAL_MS
   // has passed since we last sent an update
+  /*
   if (currentMs - previousMs > MIN_LED_UPDATE_INTERVAL_MS) {
     if (sends < SENDS_ON_CHANGE) {
       // We have a change where we have not yet sent all our requested updates
@@ -100,6 +134,7 @@ void loop() {
       // resend, so do nothing
     }
   }
+  */
 
 }
 
@@ -194,15 +229,17 @@ void sendCommand(uint16_t hue, uint8_t saturation, uint8_t brightness) {
   //delay(10);
   if(sendData(packet)){
     DEBUG_PRINT(">");
+    packets_sent++;
   } else {
     DEBUG_PRINT("X");
   }
 
-  DEBUG_PRINTLN("Send took " + (micros()-startTime) + " us");
+  //DEBUG_PRINTLN("Send took " + (micros()-startTime) + " us");
+  //DEBUG_PRINTLN("Sent packet on channel "+panstamp.cc1101.channel);
+
 }
 
 boolean sendData(CCPACKET packet) {
   boolean result = panstamp.cc1101.sendData(packet);
   return result;
 }
-

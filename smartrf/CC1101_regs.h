@@ -18,7 +18,7 @@
 /* Preamble Count = 4 */
 /* RX Filter BW = 101.562500 */
 /* Sync Word Qualifier Mode = 30/32 sync word bits detected */
-/* TX Power = 0 */
+/* TX Power = 11 */
 /* Whitening = true */
 
 // RF settings for Panstamp
@@ -47,7 +47,7 @@
 #define CC1101_DEFVAL_MDMCFG0    0xF8 // Modem Configuration
 #define CC1101_DEFVAL_DEVIATN    0x40 // Modem Deviation Setting
 #define CC1101_DEFVAL_MCSM2      0x07 // Main Radio Control State Machine Configuration
-#define CC1101_DEFVAL_MCSM1      0x30 // Main Radio Control State Machine Configuration
+#define CC1101_DEFVAL_MCSM1      0x00 // Main Radio Control State Machine Configuration
 #define CC1101_DEFVAL_MCSM0      0x18 // Main Radio Control State Machine Configuration
 #define CC1101_DEFVAL_FOCCFG     0x16 // Frequency Offset Compensation Configuration
 #define CC1101_DEFVAL_BSCFG      0x6C // Bit Synchronization Configuration
