@@ -219,7 +219,7 @@ public class BleService extends Service {
         bleManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         if (bleManager != null) {
             bleAdapter = bleManager.getAdapter();
-            if (!bleAdapter.isEnabled()) {
+            if (bleAdapter == null || !bleAdapter.isEnabled()) {
                 bleAdapter = null;
             }
         }

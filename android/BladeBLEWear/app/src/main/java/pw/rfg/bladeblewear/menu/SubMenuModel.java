@@ -48,6 +48,8 @@ public class SubMenuModel {
             //button.setBackgroundColor(model.getUiColor().toArgb());
             button.setColorFilter(model.getUiColor().toArgb());
             button.setBackgroundTintList(ColorStateList.valueOf(model.getUiColor().toArgb()));
+
+            //TODO load drawable from resource name and set into button.setImageDrawable
         }
     }
 

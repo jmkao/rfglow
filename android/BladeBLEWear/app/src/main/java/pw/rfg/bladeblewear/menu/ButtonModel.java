@@ -7,6 +7,8 @@ public class ButtonModel {
     private Color uiColor;
     private String action;
 
+    private String imgRes;
+
     public String getLabel() {
         return label;
     }
@@ -31,12 +33,21 @@ public class ButtonModel {
         this.action = action;
     }
 
+    public String getImgRes() {
+        return imgRes;
+    }
+
+    public void setImgRes(String imgRes) {
+        this.imgRes = imgRes;
+    }
+
     @Override
     public String toString() {
         return "ButtonModel{" +
                 "label='" + label + '\'' +
                 ", uiColor=" + uiColor +
                 ", action='" + action + '\'' +
+                ", imgRes='" + imgRes + '\'' +
                 '}';
     }
 }
