@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.common.io.Resources;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,6 +50,15 @@ public class SubMenuModel {
             //button.setBackgroundColor(model.getUiColor().toArgb());
             button.setColorFilter(model.getUiColor().toArgb());
             button.setBackgroundTintList(ColorStateList.valueOf(model.getUiColor().toArgb()));
+
+            if (model.getImgRes() != null && !model.getImgRes().isEmpty()) {
+                int resId = button.getContext().getResources().getIdentifier(model.getImgRes(), "drawable", button.getContext().getPackageName());
+                if (resId > 0) {
+                    button.setImageResource(resId);
+                }
+            }
+
+            //TODO load drawable from resource name and set into button.setImageDrawable
         }
     }
 

@@ -29,7 +29,7 @@ public class MenuMaster {
     }
 
     private void initTopMenu() {
-        SpeedDialMasterListener.assign(menuModel.colorMenu, menuModel.topMenu);
+        SpeedDialMasterListener.assign(menuModel.colorMenu, menuModel.topMenu, menuModel.buttonLabel);
     }
 
 

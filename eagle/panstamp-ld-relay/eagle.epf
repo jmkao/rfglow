@@ -111,7 +111,7 @@ Type="Control Panel"
 Number=0
 
 [Desktop]
-Screen="3440 2720"
+Screen="2048 1280"
 Window="Win_1"
 Window="Win_2"
 Window="Win_3"

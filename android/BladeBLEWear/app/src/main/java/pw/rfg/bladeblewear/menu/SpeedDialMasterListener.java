@@ -5,6 +5,7 @@ import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import pw.rfg.bladeblewear.util.ViewGroupUtil;
 
@@ -15,22 +16,25 @@ public class SpeedDialMasterListener implements View.OnTouchListener {
 
     private View lastHover = null;
 
-    public static SpeedDialMasterListener assign(SubMenuModel subMenu, ViewGroup parentMenu) {
-        return assign(subMenu.getActivateButton(), parentMenu, subMenu.getMenu());
+    private TextView buttonLabel;
+
+    public static SpeedDialMasterListener assign(SubMenuModel subMenu, ViewGroup parentMenu, TextView buttonLabel) {
+        return assign(subMenu.getActivateButton(), parentMenu, subMenu.getMenu(), buttonLabel);
     }
 
-    public static SpeedDialMasterListener assign(View button, ViewGroup parentMenu, ViewGroup subMenu) {
+    public static SpeedDialMasterListener assign(View button, ViewGroup parentMenu, ViewGroup subMenu, TextView buttonLabel) {
         SpeedDialMasterListener listener
-                = new SpeedDialMasterListener(parentMenu, subMenu);
+                = new SpeedDialMasterListener(parentMenu, subMenu, buttonLabel);
 
         button.setOnTouchListener(listener);
 
         return listener;
     }
 
-    private SpeedDialMasterListener(ViewGroup parentMenu, ViewGroup subMenu) {
+    private SpeedDialMasterListener(ViewGroup parentMenu, ViewGroup subMenu, TextView buttonLabel) {
         this.parentMenu = parentMenu;
         this.subMenu = subMenu;
+        this.buttonLabel = buttonLabel;
     }
 
     @Override
@@ -49,6 +53,7 @@ public class SpeedDialMasterListener implements View.OnTouchListener {
                     upView.performClick();
                     Log.v(TAG, "subButton UP on "+upView.getTag());
                 }
+                buttonLabel.setText("");
                 parentMenu.setVisibility(View.VISIBLE);
                 subMenu.setVisibility(View.INVISIBLE);
                 return true;
@@ -58,6 +63,9 @@ public class SpeedDialMasterListener implements View.OnTouchListener {
                 if (hoverView != null) {
                     //Log.v(TAG, "subMenu MOVE on "+hoverView.getTag());
                     hoverView.setPressed(true);
+                    if (hoverView.getTag() instanceof ButtonModel) {
+                        buttonLabel.setText(((ButtonModel) hoverView.getTag()).getLabel());
+                    }
                     if (lastHover != hoverView) {
                         hoverView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                         if (lastHover != null) {
@@ -68,6 +76,7 @@ public class SpeedDialMasterListener implements View.OnTouchListener {
                 } else {
                     if (lastHover != null) {
                         lastHover.setPressed(false);
+                        buttonLabel.setText("");
                         lastHover = null;
                     }
                 }
