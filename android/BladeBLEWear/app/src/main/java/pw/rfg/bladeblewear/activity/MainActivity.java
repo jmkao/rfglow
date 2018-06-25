@@ -90,6 +90,7 @@ public class MainActivity extends WearableActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         bleMaster.destroy();
     }
 }

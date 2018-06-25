@@ -1,6 +1,8 @@
 #include <string.h>
 #include <Arduino.h>
 #include <SPI.h>
+#include <avr/wdt.h>
+
 
 // For PanStamp, these will only load if #include "HardwareSerial.h" is added to
 // ~/.arduino15/packages/panstamp_avr/hardware/avr/1.5.7/cores/panstamp/Arduino.h
@@ -31,19 +33,26 @@ Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_SCK, BLUEFRUIT_SPI_MISO,
 
 #define CC1101_RECV_ADDR CC1101_DEFVAL_ADDR
 
-#define hopIntervalMicros 40000
-#define preHopMicros 10000
+#define hopIntervalMicros 40000L
+#define preHopMicros 10000L
 bool isInPreHop = false;
 unsigned long lastSendMicros = 0;
-byte fhss_schema[] = { 9, 1, 5, 6, 2, 3, 4, 0, 8, 7 };
+//byte fhss_schema[] = { 9, 1, 5, 6, 2, 3, 4, 0, 8, 7 };
 //byte fhss_schema[] = { 1 };
+//byte fhss_schema[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+byte fhss_schema[] = { 9, 17, 15, 11, 13, 8, 2, 10, 18, 12, 5, 4, 6, 19, 14, 1, 16, 7, 3, 0 };
 byte ptr_fhss_schema = 0;
 
 unsigned int packets_sent = 0;
 
+CCPACKET gPacket;
+
 unsigned long previousMs = 0;
 unsigned int sends = 255;
-unsigned int c_hue = 0, c_saturation = 0, c_brightness = 0;
+unsigned int target_hue = 0, target_saturation = 0, target_brightness = 0, target_fade_ms = 0;
+unsigned int current_hue = 0, current_saturation = 0, current_brightness = 0;
+signed long fade_dH = 0, fade_dS = 0, fade_dV = 0;
+unsigned long fade_start_ms = 0;
 
 void setup() {
   //pinMode(15, OUTPUT);
@@ -80,6 +89,8 @@ void setup() {
   ble.setMode(BLUEFRUIT_MODE_DATA);
 
   lastSendMicros = micros();
+
+  wdt_enable(WDTO_120MS);
 }
 
 void loop() {
@@ -113,29 +124,7 @@ void loop() {
     rxCallback(buffer, len);
   }
 
-
-
-  
-  // Only check for a pending update if more than LED_UPDATE_INTERVAL_MS
-  // has passed since we last sent an update
-  /*
-  if (currentMs - previousMs > MIN_LED_UPDATE_INTERVAL_MS) {
-    if (sends < SENDS_ON_CHANGE) {
-      // We have a change where we have not yet sent all our requested updates
-      sendCurrentColor();
-      sends++;
-      previousMs = currentMs;
-    } else if (currentMs - previousMs > PERIODIC_RESEND_MS) {
-      // It's been more than the periodic resend interval
-      sendCurrentColor();
-      previousMs = currentMs;
-    } else {
-      // We have no pending changes and it's not yet time for a periodic
-      // resend, so do nothing
-    }
-  }
-  */
-
+  wdt_reset();
 }
 
 void rxCallback(uint8_t *buffer, uint16_t len) {
@@ -154,13 +143,46 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
 //  
 //  DEBUG_PRINTLN("");
 
-  if (len == 4) {
+  if (len == 4 || len == 6) {
     // 4 bytes means treat as 1 16-bit and 2 8-bit uints directly
-    c_hue = (buffer[0] << 8) + buffer[1];
-    c_saturation = buffer[2];
-    c_brightness = buffer[3];
+    target_hue = (buffer[0] << 8) + buffer[1];
+    target_saturation = buffer[2];
+    target_brightness = buffer[3];
     sends = 0;
-    DEBUG_PRINTLN("Directly read: HSV=("+c_hue+"h, "+c_saturation+"s, "+c_brightness+"v)");
+    DEBUG_PRINTLN("Directly read: HSV=("+target_hue+"h, "+target_saturation+"s, "+target_brightness+"v)");
+    if (len == 6) {
+      target_fade_ms = (buffer[4] << 8) | buffer[5];
+      fade_start_ms = millis();
+      DEBUG_PRINTLN("Read fade_ms: "+target_fade_ms);
+
+      if (current_hue == 360) {
+        if (target_hue < 180) {
+          current_hue = 0;
+        }
+      } else if (current_hue == 0) {
+        if (target_hue >= 180) {
+          current_hue = 360;
+        }
+      }
+
+      if (target_hue == 360) {
+        if (current_hue < 180) {
+          target_hue = 0;
+        }
+      } else if (target_hue == 0) {
+        if (current_hue >= 180) {
+          target_hue = 360;
+        }
+      }
+    
+      fade_dH = target_hue - current_hue;
+      fade_dS = target_saturation - current_saturation;
+      fade_dV = target_brightness - current_brightness;
+
+    } else {
+      target_fade_ms = 0;
+      fade_start_ms = 0;
+    }
   } else if (len <= 11) {
     // safe number of bytes in the packet
     char inData[len+1];
@@ -173,16 +195,16 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
     DEBUG_PRINT("Parsed fields: ");
     DEBUG_PRINTLN(numExtracted);
     if (numExtracted == 3) {
-      c_hue = hue;
-      c_saturation = saturation;
-      c_brightness = brightness;
+      target_hue = hue;
+      target_saturation = saturation;
+      target_brightness = brightness;
       sends = 0;
       DEBUG_PRINT("Parsed values: ");
-      DEBUG_PRINT(c_hue);
+      DEBUG_PRINT(target_hue);
       DEBUG_PRINT(", ");
-      DEBUG_PRINT(c_saturation);
+      DEBUG_PRINT(target_saturation);
       DEBUG_PRINT(", ");
-      DEBUG_PRINTLN(c_brightness);
+      DEBUG_PRINTLN(target_brightness);
     }
   } else {
     // Buffer has some illegal amount of data
@@ -194,20 +216,47 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
 }
 
 void sendCurrentColor() {
-  sendCommand(c_hue, c_saturation, c_brightness);
+
+  if (fade_start_ms == 0 || target_fade_ms == 0) {
+    current_hue = target_hue;
+    current_saturation = target_saturation;
+    current_brightness = target_brightness;
+    fade_start_ms = 0;
+    target_fade_ms = 0;
+  } else if (target_fade_ms == 65535) {
+    // Code for UO decay
+  } else if (millis() - fade_start_ms > 60000 || millis() - fate_start_ms > target_fade_ms) {
+    // Max fade is 60 seconds, terminate the transition.
+    current_hue = target_hue;
+    current_saturation = target_saturation;
+    current_brightness = target_brightness;
+    fade_start_ms = 0;
+    target_fade_ms = 0;
+  } else {
+    // In the middle of a linear fade
+    long dT = fade_start_ms - (millis() - fade_start_ms);
+    long ratio = dT * 10000 / target_fade_ms;
+    int dH = ratio * fade_dH / 10000;
+    int dS = ratio * fade_dS / 10000;
+    int dV = ratio * fade_dV / 10000;
+
+    current_hue = target_hue - dH;
+    current_saturation = target_saturation + dH;
+  }
+    
+  sendCommand(current_hue, current_saturation, current_brightness);
 }
 
 void sendCommand(uint16_t hue, uint8_t saturation, uint8_t brightness) {
-  CCPACKET packet;
 
   unsigned long startTime = micros();
 
-  packet.length = 5;
-  packet.data[0] = CC1101_RECV_ADDR;
-  packet.data[1] = (hue >> 8) & 0xFF;
-  packet.data[2] = hue & 0xFF;
-  packet.data[3] = saturation;
-  packet.data[4] = brightness;
+  gPacket.length = 5;
+  gPacket.data[0] = CC1101_RECV_ADDR;
+  gPacket.data[1] = (hue >> 8) & 0xFF;
+  gPacket.data[2] = hue & 0xFF;
+  gPacket.data[3] = saturation;
+  gPacket.data[4] = brightness;
 
   /*
   packet.data[1] = (hue >> 8) & 0xFF;
@@ -227,7 +276,7 @@ void sendCommand(uint16_t hue, uint8_t saturation, uint8_t brightness) {
  
   //digitalWrite(PA_EN_PIN, HIGH);
   //delay(10);
-  if(sendData(packet)){
+  if(sendData(gPacket)){
     DEBUG_PRINT(">");
     packets_sent++;
   } else {

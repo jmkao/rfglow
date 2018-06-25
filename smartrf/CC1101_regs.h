@@ -2,7 +2,7 @@
 /* Base Frequency = 915.999756 */
 /* CRC Autoflush = true */
 /* CRC Enable = true */
-/* Carrier Frequency = 915.999756 */
+/* Carrier Frequency = 905.999390 */
 /* Channel Number = 0 */
 /* Channel Spacing = 199.951172 */
 /* Data Format = Normal mode */
@@ -37,9 +37,9 @@
 #define CC1101_DEFVAL_CHANNR     0x00 // Channel Number
 #define CC1101_DEFVAL_FSCTRL1    0x06 // Frequency Synthesizer Control
 #define CC1101_DEFVAL_FSCTRL0    0x00 // Frequency Synthesizer Control
-#define CC1101_DEFVAL_FREQ2      0x23 // Frequency Control Word, High Byte
-#define CC1101_DEFVAL_FREQ1      0x3B // Frequency Control Word, Middle Byte
-#define CC1101_DEFVAL_FREQ0      0x13 // Frequency Control Word, Low Byte
+#define CC1101_DEFVAL_FREQ2      0x22 // Frequency Control Word, High Byte
+#define CC1101_DEFVAL_FREQ1      0xD8 // Frequency Control Word, Middle Byte
+#define CC1101_DEFVAL_FREQ0      0x9C // Frequency Control Word, Low Byte
 #define CC1101_DEFVAL_MDMCFG4    0xC7 // Modem Configuration
 #define CC1101_DEFVAL_MDMCFG3    0x93 // Modem Configuration
 #define CC1101_DEFVAL_MDMCFG2    0x03 // Modem Configuration

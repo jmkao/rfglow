@@ -64,12 +64,14 @@ void cc1101Interrupt(void) {
 unsigned long last_rx_time = 0;
 bool fhss_on = false;  // Syncronization flag with PTX (at setup time must be false)
 
-#define hopIntervalMicros 40000
-#define preHopMicros 10000
+#define hopIntervalMicros 40000L
+#define preHopMicros 10000L
 unsigned long lastHopMicros = 0;
 boolean isInPreHop = false;
-byte fhss_schema[] = { 9, 1, 5, 6, 2, 3, 4, 0, 8, 7 };
+//byte fhss_schema[] = { 9, 1, 5, 6, 2, 3, 4, 0, 8, 7 };
 //byte fhss_schema[] = { 1 };
+//byte fhss_schema[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+byte fhss_schema[] = { 9, 17, 15, 11, 13, 8, 2, 10, 18, 12, 5, 4, 6, 19, 14, 1, 16, 7, 3, 0 };
 byte ptr_fhss_schema = 0;
 unsigned int packets_received = 0;
 
@@ -173,8 +175,8 @@ void loop() {
 //  and change channel in case this one is pertrubated for a long time
 //  In this mode I'm able to resyncronize PTX and PRX in any case (Reset of PTX, reset of PRX, channels perturbation, ecc.) and very quickly
   if((currentMicros - last_rx_time) > ((((sizeof(fhss_schema))+5)*hopIntervalMicros))) { 
-    DEBUG_PRINTLN("FHSS resync. Haven't seen data in micros: "+(currentMicros - last_rx_time));
-    //DEBUG_PRINTLN("FHSS resync.");
+    //DEBUG_PRINTLN("FHSS resync. Haven't seen data in micros: "+(currentMicros - last_rx_time));
+    DEBUG_PRINTLN("FHSS resync.");
     last_rx_time = micros();
     fhss_on=false;
     ptr_fhss_schema++;
@@ -200,6 +202,17 @@ void loop() {
     if(panstamp.cc1101.receiveData(&packet) > 0) {
       if (packet.crc_ok && packet.length > 1) {
         //DEBUG_PRINTLN("Received packet on channel "+panstamp.cc1101.channel);
+
+        #ifdef RFG_DEBUG
+          int16_t rssi;
+          if (packet.rssi >= 128) {
+            rssi = (int16_t)((int16_t)( packet.rssi - 256) / 2) - 74;
+          } else {
+            rssi = (packet.rssi / 2) - 74; 
+          }
+          DEBUG_PRINTLN("Receipt packet with RSSI: "+rssi);
+        #endif
+
         packets_received++;
         processData(packet.data);
       }
@@ -244,17 +257,10 @@ void processData(byte *data) {
   unsigned int hue;
   unsigned int saturation;
   unsigned int brightness;
-  //boolean crc = data[5] >> 7;
 
   hue = ((data[1] << 8) + data[2]);
   saturation = data[3];
   brightness = data[4];
-
-//  if (!crc) {
-//    DEBUG_PRINTLN("CRC failed. Ignoring packet. Data was: "+data[5]);
-//    return;
-//  }
-  //DEBUG_PRINTLN("Received values: "+data[0]+", "+hue+", "+saturation+", "+brightness);
 
   setHSV(hue, saturation, brightness);
   

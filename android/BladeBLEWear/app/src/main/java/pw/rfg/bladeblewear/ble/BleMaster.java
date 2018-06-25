@@ -16,11 +16,17 @@ import org.w3c.dom.Text;
 
 public class BleMaster {
     private static final String TAG = "BleMaster";
+
+    private static final int DEFAULT_BRIGHTNESS = 120;
+    private static final int DEFAULT_DIM_LEVEL = 1;
+
     private Activity mainActivity;
     private TextView statusView;
     private BleService bleService;
 
-    private int h, s, v = 128;
+    private int h = 0, s = 255, v = DEFAULT_BRIGHTNESS;
+    private int dim = DEFAULT_DIM_LEVEL;
+    private boolean off = true;
 
     private final ServiceConnection bleServiceConnection = new ServiceConnection() {
 
@@ -36,12 +42,18 @@ public class BleMaster {
     };
 
     private void sendUpdate() {
-        byte[] payload = new byte[4];
+        byte[] payload = {0, 0, 0, 0};
 
-        payload[0] = (byte) ((h >> 8) & 0x00FF);
-        payload[1] = (byte) (h & 0x00FF);
-        payload[2] = (byte) s;
-        payload[3] = (byte) v;
+        if (!this.off) {
+            int dimH = this.dim * 360 + h;
+
+            payload[0] = (byte) ((dimH >> 8) & 0x00FF);
+            payload[1] = (byte) (dimH & 0x00FF);
+            payload[2] = (byte) s;
+            payload[3] = (byte) v;
+        } else {
+            // Do nothing, payload[] is initialized to off values
+        }
 
         bleService.sendData(payload);
     }
@@ -66,10 +78,28 @@ public class BleMaster {
         mainActivity.unbindService(bleServiceConnection);
     }
 
-    public void changeHS(int h, int s) {
-        Log.d(TAG, "changeHS(): "+h+", "+s);
+    public void updateDim(int dim) {
+        Log.d(TAG, "updateDim(): "+dim);
+        this.dim = dim;
+        sendUpdate();
+    }
+
+    public void updateHS(int h, int s) {
+        this.updateHSV(h, s, this.v);
+    }
+
+    public void updateOff() {
+        this.off = true;
+        this.sendUpdate();
+    }
+
+    public void updateHSV(int h, int s, int v) {
+        Log.d(TAG, "updateHSV(): "+h+", "+s+", "+v);
+
+        this.off = false;
         this.h = h;
         this.s = s;
-        sendUpdate();
+        this.v = v;
+        this.sendUpdate();
     }
 }

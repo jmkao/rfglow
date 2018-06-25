@@ -30,6 +30,12 @@ public class MenuMaster {
 
     private void initTopMenu() {
         SpeedDialMasterListener.assign(menuModel.colorMenu, menuModel.topMenu, menuModel.buttonLabel);
+        SpeedDialMasterListener.assign(menuModel.pastelMenu, menuModel.topMenu, menuModel.buttonLabel);
+        SpeedDialMasterListener.assign(menuModel.starMenu, menuModel.topMenu, menuModel.buttonLabel);
+        SpeedDialMasterListener.assign(menuModel.bookmarkBlackMenu, menuModel.topMenu, menuModel.buttonLabel);
+        SpeedDialMasterListener.assign(menuModel.bookmarkWhiteMenu, menuModel.topMenu, menuModel.buttonLabel);
+        SpeedDialMasterListener.assign(menuModel.brightnessMenu, menuModel.topMenu, menuModel.buttonLabel);
+        SpeedDialMasterListener.assign(menuModel.gearMenu, menuModel.topMenu, menuModel.buttonLabel);
     }
 
 

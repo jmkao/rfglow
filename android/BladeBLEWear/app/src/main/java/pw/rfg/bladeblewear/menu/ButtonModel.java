@@ -6,8 +6,9 @@ public class ButtonModel {
     private String label;
     private Color uiColor;
     private String action;
-
+    private int index;
     private String imgRes;
+    private Color imgColor;
 
     public String getLabel() {
         return label;
@@ -39,6 +40,23 @@ public class ButtonModel {
 
     public void setImgRes(String imgRes) {
         this.imgRes = imgRes;
+    }
+
+    public Color getImgColor() {
+        return imgColor;
+    }
+
+    public void setImgColor(String imgColor) {
+        this.imgColor = Color.valueOf(Color.parseColor(imgColor));
+    }
+
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     @Override

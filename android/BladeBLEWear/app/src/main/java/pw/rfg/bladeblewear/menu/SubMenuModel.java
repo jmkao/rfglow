@@ -1,6 +1,7 @@
 package pw.rfg.bladeblewear.menu;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.media.Image;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -15,6 +16,7 @@ import java.util.List;
 
 public class SubMenuModel {
     private static final String TAG = "SubMenuModel";
+    private static final int defaultImgColor = Color.parseColor("#000080");
 
     private View activateButton;
     private ViewGroup menu;
@@ -44,7 +46,7 @@ public class SubMenuModel {
     private void updateButtonFromModel() {
         for (int i=0; i<models.size(); i++) {
             ButtonModel model = models.get(i);
-            ImageView button = buttons[i];
+            ImageView button = buttons[model.getIndex()];
 
             button.setTag(model);
             //button.setBackgroundColor(model.getUiColor().toArgb());
@@ -55,10 +57,15 @@ public class SubMenuModel {
                 int resId = button.getContext().getResources().getIdentifier(model.getImgRes(), "drawable", button.getContext().getPackageName());
                 if (resId > 0) {
                     button.setImageResource(resId);
+                    if (model.getImgColor() != null) {
+                        button.setColorFilter(model.getImgColor().toArgb());
+                    } else {
+                        button.setColorFilter(defaultImgColor);
+                    }
+                } else {
+                    Log.d(TAG, "No resource found: "+model.getImgRes());
                 }
             }
-
-            //TODO load drawable from resource name and set into button.setImageDrawable
         }
     }
 
