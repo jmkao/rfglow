@@ -50,6 +50,7 @@ CCPACKET gPacket;
 unsigned long previousMs = 0;
 unsigned int sends = 255;
 unsigned int target_hue = 0, target_saturation = 0, target_brightness = 0, target_fade_ms = 0;
+unsigned int maLevel = 0;
 unsigned int current_hue = 0, current_saturation = 0, current_brightness = 0;
 long fade_dH = 0, fade_dS = 0, fade_dV = 0;
 unsigned long fade_start_ms = 0;
@@ -146,11 +147,17 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
 //  DEBUG_PRINTLN("");
 
   if (len == 4 || len == 6) {
+    sends = 0;
+
     // 4 bytes means treat as 1 16-bit and 2 8-bit uints directly
     target_hue = (buffer[0] << 8) + buffer[1];
     target_saturation = buffer[2];
     target_brightness = buffer[3];
-    sends = 0;
+
+    // Extract maLevel to put back later, otherwuse 360 degree logic gets screwed up
+    maLevel = target_hue / 360;
+    target_hue = target_hue % 360;
+    
     DEBUG_PRINTLN("Directly read: HSV=("+target_hue+"h, "+target_saturation+"s, "+target_brightness+"v)");
     if (len == 6) {
       target_fade_ms = (buffer[4] << 8) | buffer[5];
@@ -250,8 +257,15 @@ void sendCurrentColor() {
     current_saturation = target_saturation - dS;
     current_brightness = target_brightness - dV;
   }
-    
-  sendCommand(current_hue, current_saturation, current_brightness);
+
+  // Add the maLevel back in when we send, and don't accidentally jump to another level.
+  uint16_t send_hue = current_hue;
+  if (send_hue == 360) {
+    send_hue = 0;
+  }
+  send_hue = send_hue + 360*maLevel;
+  
+  sendCommand(send_hue, current_saturation, current_brightness);
 }
 
 void sendCommand(uint16_t hue, uint8_t saturation, uint8_t brightness) {
