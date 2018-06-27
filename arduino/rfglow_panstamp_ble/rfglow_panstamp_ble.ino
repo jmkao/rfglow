@@ -51,7 +51,7 @@ unsigned long previousMs = 0;
 unsigned int sends = 255;
 unsigned int target_hue = 0, target_saturation = 0, target_brightness = 0, target_fade_ms = 0;
 unsigned int current_hue = 0, current_saturation = 0, current_brightness = 0;
-signed long fade_dH = 0, fade_dS = 0, fade_dV = 0;
+long fade_dH = 0, fade_dS = 0, fade_dV = 0;
 unsigned long fade_start_ms = 0;
 
 void setup() {
@@ -87,6 +87,7 @@ void setup() {
   //ble.setDisconnectCallback(disconnectCallback);
   
   ble.setMode(BLUEFRUIT_MODE_DATA);
+  ble.setTimeout(5);
 
   lastSendMicros = micros();
 
@@ -100,7 +101,7 @@ void loop() {
     ptr_fhss_schema++;  // Increment pointer of fhss schema array to perform next channel change
     if(ptr_fhss_schema >= sizeof(fhss_schema)) {
       ptr_fhss_schema=0; // To avoid array indexing overflow
-      DEBUG_PRINTLN("Packets sent: "+packets_sent);
+      //DEBUG_PRINTLN("Packets sent: "+packets_sent);
       packets_sent = 0;
     }
     panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]); // Change channel
@@ -113,14 +114,14 @@ void loop() {
   if (currentMicros - lastSendMicros > hopIntervalMicros) {
     sendCurrentColor();
     lastSendMicros = currentMicros;
-    DEBUG_PRINTLN("Sent at: "+currentMicros);
+    //DEBUG_PRINTLN("Sent at: "+currentMicros);
     isInPreHop = false;
   }
   
   if (ble.available()) {
-    uint8_t buffer[4];
+    uint8_t buffer[32];
     int len;
-    len = ble.readBLEUart(buffer, 4);
+    len = ble.readBLEUart(buffer, 31);
     rxCallback(buffer, len);
   }
 
@@ -128,7 +129,8 @@ void loop() {
 }
 
 void rxCallback(uint8_t *buffer, uint16_t len) {
-  DEBUG_PRINTLN("Received "+len+"bytes...");
+
+  DEBUG_PRINTLN("Received "+len+" bytes...");
 
 //  for(int i=0; i<len; i++)
 //   DEBUG_PRINT((char)buffer[i]); 
@@ -175,9 +177,10 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
         }
       }
     
-      fade_dH = target_hue - current_hue;
-      fade_dS = target_saturation - current_saturation;
-      fade_dV = target_brightness - current_brightness;
+      fade_dH = (int)target_hue - (int)current_hue;
+      fade_dS = (int)target_saturation - (int)current_saturation;
+      fade_dV = (int)target_brightness - (int)current_brightness;
+      DEBUG_PRINTLN("Fade deltas dH, dS, dV = "+fade_dH+", "+fade_dS+", "+fade_dV);
 
     } else {
       target_fade_ms = 0;
@@ -225,8 +228,10 @@ void sendCurrentColor() {
     target_fade_ms = 0;
   } else if (target_fade_ms == 65535) {
     // Code for UO decay
-  } else if (millis() - fade_start_ms > 60000 || millis() - fate_start_ms > target_fade_ms) {
+  } else if (millis() - fade_start_ms > 60000 || millis() - fade_start_ms > target_fade_ms) {
     // Max fade is 60 seconds, terminate the transition.
+    // Or we exceeded the fade target ms, also terminate the transition
+    
     current_hue = target_hue;
     current_saturation = target_saturation;
     current_brightness = target_brightness;
@@ -234,20 +239,24 @@ void sendCurrentColor() {
     target_fade_ms = 0;
   } else {
     // In the middle of a linear fade
-    long dT = fade_start_ms - (millis() - fade_start_ms);
-    long ratio = dT * 10000 / target_fade_ms;
+    long dT = millis() - fade_start_ms;
+    long ratio = 10000 - (dT * 10000 / target_fade_ms);
+    DEBUG_PRINTLN("Fade at "+ratio/100+"%");
     int dH = ratio * fade_dH / 10000;
     int dS = ratio * fade_dS / 10000;
     int dV = ratio * fade_dV / 10000;
 
     current_hue = target_hue - dH;
-    current_saturation = target_saturation + dH;
+    current_saturation = target_saturation - dS;
+    current_brightness = target_brightness - dV;
   }
     
   sendCommand(current_hue, current_saturation, current_brightness);
 }
 
 void sendCommand(uint16_t hue, uint8_t saturation, uint8_t brightness) {
+
+  DEBUG_PRINTLN("Send HSV: "+hue+", "+saturation+", "+brightness);
 
   unsigned long startTime = micros();
 
