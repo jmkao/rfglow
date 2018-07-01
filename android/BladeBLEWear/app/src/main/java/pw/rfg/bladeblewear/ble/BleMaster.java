@@ -42,17 +42,29 @@ public class BleMaster {
     };
 
     private void sendUpdate() {
-        byte[] payload = {0, 0, 0, 0};
+        this.sendUpdate(0);
+    }
 
-        if (!this.off) {
+    private void sendUpdate(int fadeMs) {
+        byte[] payload;
+
+        if (this.off) {
+            payload = new byte[] {0, 0, 0, 0};
+        } else {
+            if (fadeMs > 0) {
+                payload = new byte[6];
+                payload[4] = (byte) ((fadeMs >> 8) & 0x00FF);
+                payload[5] = (byte) (fadeMs & 0x00FF);
+            } else {
+                payload = new byte[4];
+            }
+
             int dimH = this.dim * 360 + h;
 
             payload[0] = (byte) ((dimH >> 8) & 0x00FF);
             payload[1] = (byte) (dimH & 0x00FF);
             payload[2] = (byte) s;
             payload[3] = (byte) v;
-        } else {
-            // Do nothing, payload[] is initialized to off values
         }
 
         bleService.sendData(payload);
