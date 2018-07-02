@@ -105,6 +105,18 @@ public class BleMaster {
         this.sendUpdate();
     }
 
+    public void updateReset() {
+        this.dim = DEFAULT_DIM_LEVEL;
+        this.v = DEFAULT_BRIGHTNESS;
+        this.off = true;
+        this.updateOff();
+    }
+
+    public void setBrightness(int v) {
+        this.v = v;
+        this.sendUpdate();
+    }
+
     public void updateHSV(int h, int s, int v) {
         Log.d(TAG, "updateHSV(): "+h+", "+s+", "+v);
 

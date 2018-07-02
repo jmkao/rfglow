@@ -28,6 +28,82 @@
         }
       ]
     },
+    "brightnessMenu": {
+      "models": [
+        {
+          "index": 12,
+          "label": "5%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(12)"
+        },
+        {
+          "index": 1,
+          "label": "10%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(25)"
+        },
+        {
+          "index": 2,
+          "label": "15%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(38)"
+        },
+        {
+          "index": 3,
+          "label": "20%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(51)"
+        },
+        {
+          "index": 4,
+          "label": "25%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(64)"
+        },
+        {
+          "index": 5,
+          "label": "30%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(76)"
+        },
+        {
+          "index": 6,
+          "label": "40%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(102)"
+        },
+        {
+          "index": 7,
+          "label": "50%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(128)"
+        },
+        {
+          "index": 8,
+          "label": "60%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(153)"
+        },
+        {
+          "index": 9,
+          "label": "70%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(179)"
+        },
+        {
+          "index": 10,
+          "label": "80%",
+          "uiColor": "#101010",
+          "action": "ble.setBrightness(204)"
+        },
+        {
+          "index": 11,
+          "label": "100%",
+          "uiColor": "#FFFFFF",
+          "action": "ble.setBrightness(255)"
+        }
+      ]
+    },
     "gearMenu": {
       "models": [
         {
