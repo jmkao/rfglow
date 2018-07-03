@@ -140,8 +140,8 @@ public class BleService extends Service {
             Log.i(TAG, "sendData() called while not connected - ignoring.");
             return;
         }
-        if (data.length != 4) {
-            Log.e(TAG, "sendData() received "+data.length+" bytes instead of 4");
+        if (data.length != 4 && data.length != 6) {
+            Log.e(TAG, "sendData() received "+data.length+" bytes instead of 4 or 6");
             return;
         }
         bleTX.setValue(data);

@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
+import android.util.Log;
 import android.view.View;
 
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.MapContext;
 
 import pw.rfg.bladeblewear.R;
@@ -65,7 +67,11 @@ public class MainActivity extends WearableActivity {
     public void jexlButtonAction(View button) {
         if (button.getTag() instanceof ButtonModel) {
             ButtonModel model = (ButtonModel)button.getTag();
-            jexl.createExpression(model.getAction()).evaluate(jexlContext);
+            try {
+                jexl.createExpression(model.getAction()).evaluate(jexlContext);
+            } catch (JexlException e) {
+                Log.e(TAG, "Jexl button error", e);
+            }
         }
     }
 
