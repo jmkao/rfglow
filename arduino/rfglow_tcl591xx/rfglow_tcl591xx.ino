@@ -80,7 +80,7 @@ unsigned long lastCmdMs = 0;
 
 unsigned int mH = 0;
 unsigned int mS = 255;
-unsigned int mB = 60;
+unsigned int mB = 15;
 
 unsigned int ma = 61;
 
@@ -220,7 +220,8 @@ void loop() {
     attachInterrupt(0, cc1101Interrupt, FALLING);
   }
 
-  if (curMs - lastCmdMs > RF_LOCKOUT_MS) {
+  //if (curMs - lastCmdMs > RF_LOCKOUT_MS) {
+  if (fhss_on == false) {
     button.tick();
     if (isAutoCycle) {
       if (curMs - prevMs > AUTO_INTERVAL) {
