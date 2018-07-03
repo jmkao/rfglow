@@ -69,6 +69,10 @@ public class MainActivity extends WearableActivity {
         }
     }
 
+    public void resetButtonAction(View button) {
+        bleMaster.updateOff();
+    }
+
     @Override
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
