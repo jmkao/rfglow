@@ -46,7 +46,14 @@ public class SubMenuModel {
     private void updateButtonFromModel() {
         for (int i=0; i<models.size(); i++) {
             ButtonModel model = models.get(i);
-            ImageView button = buttons[model.getIndex()];
+            ImageView button;
+
+            try {
+                button = buttons[model.getIndex()];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                Log.d(TAG, "Invalid model from Firestore", e);
+                continue;
+            }
 
             button.setTag(model);
             //button.setBackgroundColor(model.getUiColor().toArgb());
