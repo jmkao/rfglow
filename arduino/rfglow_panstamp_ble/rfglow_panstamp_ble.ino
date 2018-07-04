@@ -51,7 +51,7 @@ unsigned long previousMs = 0;
 unsigned int sends = 255;
 unsigned int target_hue = 0, target_saturation = 0, target_brightness = 0, target_fade_ms = 0;
 unsigned int maLevel = 0;
-unsigned int current_hue = 0, current_saturation = 0, current_brightness = 0;
+int current_hue = 0, current_saturation = 0, current_brightness = 0;
 long fade_dH = 0, fade_dS = 0, fade_dV = 0;
 unsigned long fade_start_ms = 0;
 
@@ -133,19 +133,6 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
 
   DEBUG_PRINTLN("Received "+len+" bytes...");
 
-//  for(int i=0; i<len; i++)
-//   DEBUG_PRINT((char)buffer[i]); 
-
-//  DEBUG_PRINT(F(" ["));
-
-//  for(int i=0; i<len; i++) {
-//    DEBUG_PRINT(" 0x");
-//    DEBUG_PRINT((char)buffer[i] + HEX); 
-//  }
-//  DEBUG_PRINT(F(" ]"));
-//  
-//  DEBUG_PRINTLN("");
-
   if (len == 4 || len == 6) {
     sends = 0;
 
@@ -159,32 +146,19 @@ void rxCallback(uint8_t *buffer, uint16_t len) {
     target_hue = target_hue % 360;
     
     DEBUG_PRINTLN("Directly read: HSV=("+target_hue+"h, "+target_saturation+"s, "+target_brightness+"v)");
+
     if (len == 6) {
       target_fade_ms = (buffer[4] << 8) | buffer[5];
       fade_start_ms = millis();
       DEBUG_PRINTLN("Read fade_ms: "+target_fade_ms);
-
-      if (current_hue == 360) {
-        if (target_hue < 180) {
-          current_hue = 0;
-        }
-      } else if (current_hue == 0) {
-        if (target_hue >= 180) {
-          current_hue = 360;
-        }
-      }
-
-      if (target_hue == 360) {
-        if (current_hue < 180) {
-          target_hue = 0;
-        }
-      } else if (target_hue == 0) {
-        if (current_hue >= 180) {
-          target_hue = 360;
-        }
-      }
     
       fade_dH = (int)target_hue - (int)current_hue;
+      if (fade_dH > 180) {
+        fade_dH -= 360;
+      } else if (fade_dH <= -180) {
+        fade_dH += 360;
+      }
+      
       fade_dS = (int)target_saturation - (int)current_saturation;
       fade_dV = (int)target_brightness - (int)current_brightness;
       DEBUG_PRINTLN("Fade deltas dH, dS, dV = "+fade_dH+", "+fade_dS+", "+fade_dV);
@@ -253,15 +227,20 @@ void sendCurrentColor() {
     int dS = ratio * fade_dS / 10000;
     int dV = ratio * fade_dV / 10000;
 
-    current_hue = target_hue - dH;
+    current_hue = (int)target_hue - dH;
+    if (current_hue >= 360) {
+      current_hue -= 360;
+    } else if (current_hue < 0) {
+      current_hue += 360;
+    }
     current_saturation = target_saturation - dS;
     current_brightness = target_brightness - dV;
   }
 
   // Add the maLevel back in when we send, and don't accidentally jump to another level.
   uint16_t send_hue = current_hue;
-  if (send_hue == 360) {
-    send_hue = 0;
+  if (send_hue >= 360) {
+    send_hue -= 360;
   }
   send_hue = send_hue + 360*maLevel;
   

@@ -93,7 +93,7 @@
                 android:layout_marginStart="8dp"
                 android:hapticFeedbackEnabled="true"
                 android:onClick="resetButtonAction"
-                android:src="@drawable/ic_settings_backup_restore_black_24dp"
+                android:src="@drawable/ic_highlight_off_black_24dp"
                 android:tag="editColorButton"
                 android:tint="@color/white"
                 app:backgroundTint="@color/dark_grey"
