@@ -52,8 +52,14 @@ boolean packetAvailable = false;
 #define power_twi_enable()      (PRR &= (uint8_t)~(1 << PRTWI))
 #define power_twi_disable()     (PRR |= (uint8_t)(1 << PRTWI))
 
+// Pin that the button is on
+// Newer boards (after adding u.fl connector) are on pin 18 for eventual use with interrupts
+// Older boards are on pin 19
+#define BUTTON_PIN 18
+//#define BUTTON_PIN 19
+
 // OneButton Setup
-OneButton button(19, true);
+OneButton button(18, true);
 //ClickButton button(4, LOW, CLICKBTN_PULLUP);
 
 void cc1101Interrupt(void) {
@@ -396,4 +402,3 @@ void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
     driver->set_outputs(leds);
   }
 }
-
