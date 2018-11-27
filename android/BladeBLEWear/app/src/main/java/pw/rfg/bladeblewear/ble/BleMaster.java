@@ -29,11 +29,23 @@ public class BleMaster {
     private int dim = DEFAULT_DIM_LEVEL;
     private volatile boolean off = true;
 
+    private static final int UO_HALFLIFE_MS = 38000;
+
+    private static final int[][] UO_CYCLE_ARRAY = {
+            {10, 255, 255},
+            {10, 255, 128},
+            {10, 255, 64},
+            {10, 255, 32},
+            {10, 255, 16},
+            {10, 255, 8}
+    };
+
     private int[][] cycleArray = null;
     private int cycleIndex = -1;
     private int cycleFadeMs = 0;
     private int cycleDelayMs = 0;
     private boolean isCycling = false;
+    private boolean isUO = false;
 
     private Handler handler = new Handler();
     private Runnable cycleTask = new Runnable() {
@@ -47,12 +59,27 @@ public class BleMaster {
           }
           cycleIndex++;
           cycleIndex = cycleIndex % cycleArray.length;
-          BleMaster.this.h = cycleArray[cycleIndex][0];
-          BleMaster.this.s = cycleArray[cycleIndex][1];
-          if (cycleArray[cycleIndex].length == 3) {
-              BleMaster.this.v = cycleArray[cycleIndex][2];
+          if (isUO) {
+              // Terminate if we loop
+              if (cycleIndex == 0) {
+                  BleMaster.this.isCycling = false;
+                  BleMaster.this.isUO = false;
+                  BleMaster.this.cycleIndex = -1;
+                  BleMaster.this.cycleArray = null;
+                  return;
+              }
+              int tmpDim = BleMaster.this.dim;
+              BleMaster.this.dim = 0;
+              BleMaster.this.sendUpdate(cycleArray[cycleIndex][0], cycleArray[cycleIndex][1], cycleArray[cycleIndex][2], cycleFadeMs);
+              BleMaster.this.dim = tmpDim;
+          } else {
+              BleMaster.this.h = cycleArray[cycleIndex][0];
+              BleMaster.this.s = cycleArray[cycleIndex][1];
+              if (cycleArray[cycleIndex].length == 3) {
+                  BleMaster.this.v = cycleArray[cycleIndex][2];
+              }
+              BleMaster.this.sendUpdate(cycleFadeMs);
           }
-          BleMaster.this.sendUpdate(cycleFadeMs);
           handler.postDelayed(this, cycleDelayMs);
         }
     };
@@ -75,6 +102,10 @@ public class BleMaster {
     }
 
     private void sendUpdate(int fadeMs) {
+        this.sendUpdate(this.h, this.s, this.v, fadeMs);
+    }
+
+    private void sendUpdate(int h, int s, int v, int fadeMs) {
         byte[] payload;
 
         if (this.off) {
@@ -116,6 +147,7 @@ public class BleMaster {
     }
 
     public void destroy() {
+        handler.removeCallbacks(cycleTask);
         mainActivity.unbindService(bleServiceConnection);
     }
 
@@ -133,6 +165,7 @@ public class BleMaster {
         handler.removeCallbacks(cycleTask);
         this.off = true;
         this.isCycling = false;
+        this.isUO = false;
         this.sendUpdate();
     }
 
@@ -142,6 +175,7 @@ public class BleMaster {
         this.v = DEFAULT_BRIGHTNESS;
         this.off = true;
         this.isCycling = false;
+        this.isUO = false;
         this.updateOff();
     }
 
@@ -157,6 +191,7 @@ public class BleMaster {
         Log.d(TAG, "updateHSV(): "+h+", "+s+", "+v);
         handler.removeCallbacks(cycleTask);
         this.isCycling = false;
+        this.isUO = false;
         this.off = false;
         this.h = h;
         this.s = s;
@@ -172,10 +207,29 @@ public class BleMaster {
         this.cycleArray = hsArray;
         this.cycleIndex = 0;
         this.isCycling = true;
+        this.isUO = false;
 
         this.h = hsArray[0][0];
         this.s = hsArray[0][1];
         this.sendUpdate();
-        handler.postDelayed(cycleTask, cycleDelayMs);
+        handler.postDelayed(cycleTask, 100);
+    }
+
+    public void updateUO() {
+        handler.removeCallbacks(cycleTask);
+        this.off = false;
+        this.cycleArray = UO_CYCLE_ARRAY;
+        this.cycleFadeMs = UO_HALFLIFE_MS;
+        this.cycleDelayMs = UO_HALFLIFE_MS;
+        this.cycleIndex = 0;
+        this.isCycling = true;
+        this.isUO = true;
+
+        int tmpDim = this.dim;
+        this.dim = 0;
+        this.sendUpdate(UO_CYCLE_ARRAY[0][0], UO_CYCLE_ARRAY[0][1], UO_CYCLE_ARRAY[0][2], 0);
+        this.dim = tmpDim;
+
+        handler.postDelayed(cycleTask, 5000);
     }
 }

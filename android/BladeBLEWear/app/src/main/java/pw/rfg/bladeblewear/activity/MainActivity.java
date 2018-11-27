@@ -60,6 +60,7 @@ public class MainActivity extends WearableActivity {
                 jexl = new JexlBuilder().cache(16).strict(false).silent(true).create();
                 jexlContext = new MapContext();
                 jexlContext.set("ble", bleMaster);
+                jexlContext.set("main", this);
             }
         }
     }
@@ -73,6 +74,11 @@ public class MainActivity extends WearableActivity {
                 Log.e(TAG, "Jexl button error", e);
             }
         }
+    }
+
+    public void quit() {
+        bleMaster.updateReset();
+        this.finishAffinity();
     }
 
     public void resetButtonAction(View button) {
