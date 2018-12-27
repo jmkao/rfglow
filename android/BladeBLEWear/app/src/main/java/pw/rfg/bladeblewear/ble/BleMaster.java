@@ -73,12 +73,13 @@ public class BleMaster {
               BleMaster.this.sendUpdate(cycleArray[cycleIndex][0], cycleArray[cycleIndex][1], cycleArray[cycleIndex][2], cycleFadeMs);
               BleMaster.this.dim = tmpDim;
           } else {
+              int sendV = BleMaster.this.v;
               BleMaster.this.h = cycleArray[cycleIndex][0];
               BleMaster.this.s = cycleArray[cycleIndex][1];
               if (cycleArray[cycleIndex].length == 3) {
-                  BleMaster.this.v = cycleArray[cycleIndex][2];
+                  sendV = cycleArray[cycleIndex][2];
               }
-              BleMaster.this.sendUpdate(cycleFadeMs);
+              BleMaster.this.sendUpdate(h, s, sendV, cycleFadeMs);
           }
           handler.postDelayed(this, cycleDelayMs);
         }
@@ -142,6 +143,11 @@ public class BleMaster {
             public void onReceive(Context context, Intent intent) {
                 String status = intent.getStringExtra("status");
                 BleMaster.this.statusView.setText(status);
+                if ("Connected".equals(status)) {
+                    if (!isCycling) {
+                        sendUpdate();
+                    }
+                }
             }
         }, new IntentFilter("bleStatus"));
     }

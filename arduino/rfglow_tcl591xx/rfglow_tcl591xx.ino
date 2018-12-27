@@ -1,100 +1,5 @@
-#include <avr/pgmspace.h>
-#include "HardwareSerial.h"
-
-#include <OneButton.h>
-
-//#include <cc1101.h>
-//#include <panstamp.h>
-
-#define TLC59116_LOWLEVEL 0
-#define TLC59116_DEV 0
-#include <TLC59116.h>
-
-// Logging Setup
-#define RFG_DEBUG
-
-String log_prefix = String("RFG: ");
-
-#ifdef RFG_DEBUG
-  #define DEBUG_PRINTLN(x) Serial.println (log_prefix + x)
-  #define DEBUG_PRINT(x) Serial.print (log_prefix + x)
-#else
-  #define DEBUG_PRINTLN(x)
-  #define DEBUG_PRINT(x)
-#endif
-
-// TLC59116 Setup
-TLC59116Manager tlcmanager;
-TLC59116* driver = NULL;
-
-// CC1101 Setup
-boolean packetAvailable = false;
-
-// Power saving #defines
-#define power_adc_enable()      (PRR &= (uint8_t)~(1 << PRADC))
-#define power_adc_disable()     (PRR |= (uint8_t)(1 << PRADC))
-
-#define power_spi_enable()      (PRR &= (uint8_t)~(1 << PRSPI))
-#define power_spi_disable()     (PRR |= (uint8_t)(1 << PRSPI))
-
-#define power_usart0_enable()   (PRR &= (uint8_t)~(1 << PRUSART0))
-#define power_usart0_disable()  (PRR |= (uint8_t)(1 << PRUSART0))
-
-#define power_timer0_enable()   (PRR &= (uint8_t)~(1 << PRTIM0))
-#define power_timer0_disable()  (PRR |= (uint8_t)(1 << PRTIM0))
-
-#define power_timer1_enable()   (PRR &= (uint8_t)~(1 << PRTIM1))
-#define power_timer1_disable()  (PRR |= (uint8_t)(1 << PRTIM1))
-
-#define power_timer2_enable()   (PRR &= (uint8_t)~(1 << PRTIM2))
-#define power_timer2_disable()  (PRR |= (uint8_t)(1 << PRTIM2))
-
-#define power_twi_enable()      (PRR &= (uint8_t)~(1 << PRTWI))
-#define power_twi_disable()     (PRR |= (uint8_t)(1 << PRTWI))
-
-// Pin that the button is on
-// Newer boards (after adding u.fl connector) are on pin 18 for eventual use with interrupts
-// Older boards are on pin 19
-#define BUTTON_PIN 18
-//#define BUTTON_PIN 19
-
-// OneButton Setup
-OneButton button(18, true);
-//ClickButton button(4, LOW, CLICKBTN_PULLUP);
-
-void cc1101Interrupt(void) {
-  packetAvailable = true;
-  TCNT1 = 0; // Reset Interrupt counter 
-}
-
-unsigned long last_rx_time = 0;
-bool fhss_on = false;  // Syncronization flag with PTX (at setup time must be false)
-
-#define hopIntervalMicros 40000L
-#define preHopMicros 10000L
-unsigned long lastHopMicros = 0;
-boolean isInPreHop = false;
-//byte fhss_schema[] = { 9, 1, 5, 6, 2, 3, 4, 0, 8, 7 };
-//byte fhss_schema[] = { 1 };
-//byte fhss_schema[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
-byte fhss_schema[] = { 9, 17, 15, 11, 13, 8, 2, 10, 18, 12, 5, 4, 6, 19, 14, 1, 16, 7, 3, 0 };
-byte ptr_fhss_schema = 0;
-unsigned int packets_received = 0;
-
-#define RF_LOCKOUT_MS 4000
-unsigned long lastCmdMs = 0;
-
-unsigned int mH = 0;
-unsigned int mS = 255;
-unsigned int mB = 15;
-
-unsigned int ma = 61;
-
-int clickState = 0;
-
-#define AUTO_INTERVAL 100
-boolean isAutoCycle = false;
-unsigned long prevMs = 0;
+#include "rfglow_tcl591xx.h"
+#include "rfglow_globals.h"
 
 void setup() {
   
@@ -103,19 +8,29 @@ void setup() {
     Serial.println("Startup serial");
   #endif
   DEBUG_PRINTLN("TCL591XX Test");
-  //DEBUG_PRINTLN("setup()");
 
-  power_adc_disable();
-  //power_timer0_disable();
-  //power_timer1_disable();
-  //power_timer2_disable();
-  
+  // Init TLC59116
+  tlcmanager.init();
+  driver = &(tlcmanager[0]);
+  driver->enable_outputs(true);
+  driver->set_milliamps(ma);
+
+  // Check battery voltage and show as color during init delays
+  float vIn = (float)vbatRead() / 1000.0;
+  if (vIn > 4.0) {
+    setRGBRaw(0,0,15);
+  } else if (vIn > 3.5) {
+    setRGBRaw(0,15,0);
+  } else if (vIn > 3.1) {
+    setRGBRaw(7, 7, 0);
+  } else {
+    setRGBRaw(15, 0, 0);
+  }
+  delay(500);
+
   // Init CC1101
   panstamp.cc1101.setTxPowerAmp(0x03);
   panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]);
-
-  last_rx_time = micros();
-  
   panstamp.cc1101.setRxState();
   attachInterrupt(0, cc1101Interrupt, FALLING);
 
@@ -124,39 +39,21 @@ void setup() {
   button.attachDoubleClick(doubleClickAction);
   button.attachLongPressStart(longPressAction);
   button.setClickTicks(150);
-  /*
-  button.debounceTime = 20;
-  button.multiclickTime = 85;
-  button.longClickTime = 1000;
-  */
 
-  // Init TLC59116
-  tlcmanager.init();
-  
-  //sleepDriver(false);
-  driver = &(tlcmanager[0]);
-  driver->enable_outputs(true);
-  driver->set_milliamps(ma);
-  
-  
-  driver->pattern(0b1100000000000000);
-  delay(50);
-  driver->pattern(0b0000011000000000);
-  delay(50);
-  driver->pattern(0b0000000000011000);
-  delay(50);
-  driver->pattern(0b0000000000000000);
+  // Init global state
+  power_adc_disable();
+  last_rx_time = micros();
 
-  driver->enable_outputs(false);  
-
+  // Flash to indicate we're ready
+  setupFlashLED();
 }
 
 void loop() {
   
   if (!isInPreHop && micros() - lastHopMicros > hopIntervalMicros - preHopMicros) {    
-    if(fhss_on==true) {  // Only if we are synced with PTX and if it's time to perform channel change (10ms before expected data from PTX)
+    if (fhss_on==true) {
       ptr_fhss_schema++;  // Increment pointer of fhss schema array to perform next channel change
-      if(ptr_fhss_schema >= sizeof(fhss_schema)) {
+      if (ptr_fhss_schema >= sizeof(fhss_schema)) {
         ptr_fhss_schema=0; // To avoid fhss schema array indexing overflow
         //DEBUG_PRINTLN("Packets received: "+packets_received);
         packets_received = 0;
@@ -176,24 +73,23 @@ void loop() {
     lastHopMicros = currentMicros;
     isInPreHop = false;
   }
-
-//  The following code serves to declare "out of sync" of the receiver if we don't receive data for a time needed to cover the entire channels sequency schema (plus a little extra delay)
-//  and change channel in case this one is pertrubated for a long time
-//  In this mode I'm able to resyncronize PTX and PRX in any case (Reset of PTX, reset of PRX, channels perturbation, ecc.) and very quickly
-  if((currentMicros - last_rx_time) > ((((sizeof(fhss_schema))+5)*hopIntervalMicros))) { 
+  
+  // Detect when ptr_fhss_schema is out of sync with transmitter, then recover by
+  // switching channel to ptr_fhss_schema = 0 and wait until we hear something
+  if ((currentMicros - last_rx_time) > ((((sizeof(fhss_schema))+5)*hopIntervalMicros))) { 
     //DEBUG_PRINTLN("FHSS resync. Haven't seen data in micros: "+(currentMicros - last_rx_time));
     DEBUG_PRINTLN("FHSS resync.");
     last_rx_time = micros();
     fhss_on=false;
     ptr_fhss_schema++;
-    if(ptr_fhss_schema >= sizeof(fhss_schema)) {
+    if (ptr_fhss_schema >= sizeof(fhss_schema)) {
       ptr_fhss_schema=0;
     }
     panstamp.cc1101.setChannel(fhss_schema[ptr_fhss_schema]);
   }
 
   
-  if(packetAvailable) {
+  if (packetAvailable) {
     packetAvailable = false;
 
     fhss_on=true; // Now we can follow the fhss schema (we are synced with PTX channel and with interrupt time of PTX)
@@ -205,7 +101,7 @@ void loop() {
     
     detachInterrupt(0);
     
-    if(panstamp.cc1101.receiveData(&packet) > 0) {
+    if (panstamp.cc1101.receiveData(&packet) > 0) {
       if (packet.crc_ok && packet.length > 1) {
         //DEBUG_PRINTLN("Received packet on channel "+panstamp.cc1101.channel);
 
@@ -216,7 +112,7 @@ void loop() {
           } else {
             rssi = (packet.rssi / 2) - 74; 
           }
-          DEBUG_PRINTLN("Receipt packet with RSSI: "+rssi);
+          DEBUG_PRINTLN("Received packet with RSSI: "+rssi);
         #endif
 
         packets_received++;
@@ -226,7 +122,6 @@ void loop() {
     attachInterrupt(0, cc1101Interrupt, FALLING);
   }
 
-  //if (curMs - lastCmdMs > RF_LOCKOUT_MS) {
   if (fhss_on == false) {
     button.tick();
     if (isAutoCycle) {
@@ -239,6 +134,11 @@ void loop() {
       prevMs = curMs;
     } 
   }
+}
+
+void cc1101Interrupt(void) {
+  packetAvailable = true;
+  TCNT1 = 0; // Reset Interrupt counter 
 }
 
 void clickAction() {
@@ -401,4 +301,50 @@ void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
     
     driver->set_outputs(leds);
   }
+}
+
+ISR(ADC_vect) { adcDone = true; }
+
+static int vccRead (byte count =4) {
+  set_sleep_mode(SLEEP_MODE_ADC);
+  ADMUX = bit(REFS0) | 14; // use VCC and internal bandgap
+  bitSet(ADCSRA, ADIE);
+  while (count-- > 0) {
+    adcDone = false;
+    while (!adcDone)
+      sleep_mode();
+  }
+  bitClear(ADCSRA, ADIE);  
+  
+  // convert ADC readings to fit in one byte, i.e. 20 mV steps:
+  //  1.0V = 0, 1.8V = 40, 3.3V = 115, 5.0V = 200, 6.0V = 250
+  // return (55U * 1023U) / (ADC + 1) - 50;
+  int vcc =  (1100L * 1023) / ADC;
+  DEBUG_PRINTLN("Regulated Vcc: "+vcc);
+
+  return vcc;
+}
+
+static int vbatRead() {
+  byte count = 4;
+  
+  set_sleep_mode(SLEEP_MODE_ADC);
+  ADMUX = 1 << REFS0 | 0; // use VCC and A0
+  bitSet(ADCSRA, ADIE);
+  while (count-- > 0) {
+    adcDone = false;
+    while (!adcDone)
+      sleep_mode();
+  }
+  bitClear(ADCSRA, ADIE);  
+
+  int vbatRaw = ADC;
+  DEBUG_PRINTLN("Vbat raw ADC value: "+vbatRaw);
+
+  int vcc = vccRead();
+  
+  int vbat = (long)vcc * vbatRaw * 2 / 1023;
+  DEBUG_PRINTLN("Vbat: "+vbat);
+
+  return vbat;
 }
