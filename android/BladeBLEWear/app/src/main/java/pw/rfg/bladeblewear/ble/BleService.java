@@ -37,9 +37,11 @@ public class BleService extends Service {
     private static final ParcelUuid TX_UUID = ParcelUuid.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
     private static final ParcelUuid SERVICE_UUID = ParcelUuid.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
 
+    private static final boolean GATT_AUTOCONNECT = true;
+
     private static final ScanSettings scanSettings =
             new ScanSettings.Builder()
-                    .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+                    .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
                     .setMatchMode(ScanSettings.MATCH_MODE_STICKY)
                     //.setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH)
                     .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
@@ -75,6 +77,7 @@ public class BleService extends Service {
         public void onScanResult(int callbackType, ScanResult result) {
             BluetoothDevice device = result.getDevice();
             Log.d(TAG, "BLE onScanResult() for device: "+device.getName());
+            Log.i(TAG, "BLE device address: "+device.getAddress());
             Log.d(TAG, "onScanResult callbackType: "+callbackType);
             if (!DEVICE_NAME.equals(device.getName())) {
                 return;
@@ -90,7 +93,7 @@ public class BleService extends Service {
                         +bleManager.getConnectionState(bleGatt.getDevice(),BluetoothProfile.GATT));
                 return;
             }
-            bleGatt = device.connectGatt(BleService.this, false, gattCallback);
+            bleGatt = device.connectGatt(BleService.this, GATT_AUTOCONNECT, gattCallback);
         }
 
         @Override
@@ -110,7 +113,12 @@ public class BleService extends Service {
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                initBle();
+                if (GATT_AUTOCONNECT) {
+                    // Just update state string if we are set to autoconnect, should not need to re-init
+                    updateBleStatus("Disconnected");
+                } else {
+                    initBle();
+                }
                 return;
             }
         }
@@ -161,9 +169,13 @@ public class BleService extends Service {
         cleanup();
         this.updateBleStatus("Initializing");
         bleScanner = bleAdapter.getBluetoothLeScanner();
-        this.updateBleStatus("Scanning");
-        bleScanner.startScan(scanFilters, scanSettings, scanCallback);
-        //bleScanner.startScan(scanCallback);
+
+//        this.updateBleStatus("Scanning");
+//        bleScanner.startScan(scanFilters, scanSettings, scanCallback);
+
+        this.updateBleStatus("Waiting");
+        BluetoothDevice device = bleAdapter.getRemoteDevice("FA:A7:47:F5:81:F3");
+        this.bleGatt = device.connectGatt(BleService.this, GATT_AUTOCONNECT, this.gattCallback);
     }
 
     private void cleanup() {
