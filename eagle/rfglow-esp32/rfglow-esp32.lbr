@@ -7,7 +7,7 @@
 <setting keepoldvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -137,6 +137,7 @@
 <layer number="254" name="cooling" color="7" fill="1" visible="no" active="yes"/>
 </layers>
 <library>
+<description>Custom parts used for rfglow-esp32</description>
 <packages>
 <package name="PW_R-PDSO-G28">
 <description>&lt;b&gt;PLASTIC SMALL-OUTLINE PACKAGE SO 28&lt;/b&gt; JEDEC MO-153, PW Type&lt;p&gt;
@@ -353,9 +354,9 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 <wire x1="9.8" y1="9.85" x2="9.8" y2="-10.4" width="0.05" layer="39"/>
 <wire x1="9.8" y1="-10.4" x2="-9.8" y2="-10.4" width="0.05" layer="39"/>
 <wire x1="-9.8" y1="-10.4" x2="-9.8" y2="9.85" width="0.05" layer="39"/>
-<text x="-8.960240625" y="10.3118" size="1.27145" layer="25">&gt;NAME</text>
-<text x="-9.71678125" y="-12.171" size="1.2722" layer="27">&gt;VALUE</text>
-<circle x="-10.65" y="8.54" radius="0.312409375" width="0.254" layer="21"/>
+<text x="-6.420240625" y="6.5018" size="1.27145" layer="25">&gt;NAME</text>
+<text x="-7.04978125" y="-7.218" size="1.2722" layer="27">&gt;VALUE</text>
+<circle x="-7.221" y="8.413" radius="0.312409375" width="0.254" layer="21"/>
 <smd name="14" x="-8.83" y="-8.1" dx="1.45" dy="0.86" layer="1"/>
 <smd name="13" x="-8.83" y="-6.83" dx="1.45" dy="0.86" layer="1"/>
 <smd name="12" x="-8.83" y="-5.56" dx="1.45" dy="0.86" layer="1"/>
@@ -384,17 +385,23 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 <smd name="36" x="8.83" y="5.87" dx="1.45" dy="0.86" layer="1"/>
 <smd name="37" x="8.83" y="7.14" dx="1.45" dy="0.86" layer="1"/>
 <smd name="38" x="8.83" y="8.41" dx="1.45" dy="0.86" layer="1"/>
-<smd name="20" x="0.635" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
-<smd name="21" x="1.905" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
-<smd name="22" x="3.175" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
 <smd name="23" x="4.445" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
 <smd name="24" x="5.715" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
-<smd name="19" x="-0.635" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
-<smd name="18" x="-1.905" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
-<smd name="17" x="-3.175" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
 <smd name="16" x="-4.445" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
 <smd name="15" x="-5.715" y="-9.43" dx="1.45" dy="0.86" layer="1" rot="R90"/>
 <smd name="39" x="-1.46" y="0.77" dx="3.5" dy="3.5" layer="1"/>
+<text x="6.604" y="8.763" size="0.6096" layer="21">J39</text>
+<wire x1="6.858" y1="7.62" x2="6.858" y2="5.08" width="0.127" layer="21"/>
+<wire x1="6.858" y1="5.08" x2="4.318" y2="5.08" width="0.127" layer="21"/>
+<wire x1="4.318" y1="5.08" x2="4.318" y2="7.62" width="0.127" layer="21"/>
+<wire x1="4.318" y1="7.62" x2="6.858" y2="7.62" width="0.127" layer="21"/>
+<circle x="5.588" y="6.35" radius="0.635" width="0.127" layer="21"/>
+<wire x1="-7.874" y1="9.144" x2="-7.874" y2="-8.509" width="0.127" layer="21"/>
+<wire x1="-7.874" y1="-8.509" x2="7.747" y2="-8.509" width="0.127" layer="21"/>
+<wire x1="7.747" y1="-8.509" x2="7.747" y2="4.445" width="0.127" layer="21"/>
+<wire x1="7.747" y1="4.445" x2="3.302" y2="4.445" width="0.127" layer="21"/>
+<wire x1="3.302" y1="4.445" x2="3.302" y2="9.144" width="0.127" layer="21"/>
+<wire x1="3.302" y1="9.144" x2="-7.874" y2="9.144" width="0.127" layer="21"/>
 </package>
 <package name="DRC0010J">
 <smd name="1" x="-1.4" y="1" dx="0.24" dy="0.6" layer="1" rot="R90"/>
@@ -470,6 +477,25 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 <smd name="3" x="-1.185" y="-0.95" dx="0.6" dy="1.35" layer="1" roundness="15" rot="R270"/>
 <smd name="4" x="1.185" y="-0.95" dx="0.6" dy="1.35" layer="1" roundness="15" rot="R270"/>
 <smd name="5" x="1.185" y="0.95" dx="0.6" dy="1.35" layer="1" roundness="15" rot="R270"/>
+</package>
+<package name="SMT(4.2X3.2)">
+<description>&lt;b&gt;SMT(4.2x3.2)&lt;/b&gt;&lt;br&gt;
+</description>
+<smd name="1" x="-2.075" y="1.075" dx="1.05" dy="0.65" layer="1"/>
+<smd name="2" x="2.075" y="1.075" dx="1.05" dy="0.65" layer="1"/>
+<smd name="3" x="-2.075" y="-1.075" dx="1.05" dy="0.65" layer="1"/>
+<smd name="4" x="2.075" y="-1.075" dx="1.05" dy="0.65" layer="1"/>
+<text x="-0.23333125" y="0.0507" size="1.27" layer="25" align="center">&gt;NAME</text>
+<text x="-0.23333125" y="0.0507" size="1.27" layer="27" align="center">&gt;VALUE</text>
+<wire x1="-2.1" y1="1.6" x2="2.1" y2="1.6" width="0.2" layer="51"/>
+<wire x1="2.1" y1="1.6" x2="2.1" y2="-1.6" width="0.2" layer="51"/>
+<wire x1="2.1" y1="-1.6" x2="-2.1" y2="-1.6" width="0.2" layer="51"/>
+<wire x1="-2.1" y1="-1.6" x2="-2.1" y2="1.6" width="0.2" layer="51"/>
+<wire x1="-2.1" y1="1.6" x2="2.1" y2="1.6" width="0.2" layer="21"/>
+<wire x1="2.1" y1="-1.6" x2="-2.1" y2="-1.6" width="0.2" layer="21"/>
+<wire x1="-2.1" y1="0.5" x2="-2.1" y2="-0.5" width="0.2" layer="21"/>
+<wire x1="2.1" y1="0.5" x2="2.1" y2="-0.5" width="0.2" layer="21"/>
+<circle x="-2.906" y="1.089" radius="0.05336875" width="0.2" layer="25"/>
 </package>
 </packages>
 <symbols>
@@ -635,12 +661,6 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 <pin name="IO23" x="-17.78" y="-27.94" length="short"/>
 <pin name="RXD0" x="17.78" y="-17.78" length="short" rot="R180"/>
 <pin name="TXD0" x="17.78" y="-15.24" length="short" rot="R180"/>
-<pin name="SHD/SD2" x="17.78" y="12.7" length="short" rot="R180"/>
-<pin name="SWP/SD3" x="17.78" y="10.16" length="short" rot="R180"/>
-<pin name="SCS/CMD" x="17.78" y="7.62" length="short" rot="R180"/>
-<pin name="SCL/CLK" x="17.78" y="5.08" length="short" rot="R180"/>
-<pin name="SDO/SD0" x="17.78" y="2.54" length="short" rot="R180"/>
-<pin name="SD1/SD1" x="17.78" y="0" length="short" rot="R180"/>
 <pin name="EXP" x="17.78" y="-25.4" length="short" direction="pwr" rot="R180"/>
 </symbol>
 <symbol name="TPS63000DRC">
@@ -673,6 +693,18 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 <pin name="VIN" x="-12.7" y="5.08" length="middle" direction="pwr"/>
 <pin name="VOUT" x="12.7" y="5.08" length="middle" direction="pwr" rot="R180"/>
 <pin name="EN" x="-12.7" y="0" length="middle" direction="in"/>
+</symbol>
+<symbol name="SKRPABE010">
+<wire x1="5.08" y1="2.54" x2="15.24" y2="2.54" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-5.08" x2="15.24" y2="2.54" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-5.08" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
+<text x="16.51" y="7.62" size="1.778" layer="95" align="center-left">&gt;NAME</text>
+<text x="16.51" y="5.08" size="1.778" layer="96" align="center-left">&gt;VALUE</text>
+<pin name="1" x="0" y="0" length="middle"/>
+<pin name="2" x="0" y="-2.54" length="middle"/>
+<pin name="3" x="20.32" y="0" length="middle" rot="R180"/>
+<pin name="4" x="20.32" y="-2.54" length="middle" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -823,6 +855,7 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 </devices>
 </deviceset>
 <deviceset name="VLCF4020T-4R7N1R2">
+<description>303010126</description>
 <gates>
 <gate name="A" symbol="IND" x="2.54" y="2.54" swaplevel="1"/>
 </gates>
@@ -840,13 +873,13 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="ESP32-WROOM-32U" prefix="U">
+<deviceset name="ESP32-WROOM-32U" prefix="IC">
 <description>Wi-Fi/BT BLE Module ESP32-D0WD SPI Flash UART U.FL Conn.</description>
 <gates>
 <gate name="G$1" symbol="ESP32-WROOM-32U" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="XCVR_ESP32-WROOM-32U">
+<device name="NOSD" package="XCVR_ESP32-WROOM-32U">
 <connects>
 <connect gate="G$1" pin="3V3" pad="2"/>
 <connect gate="G$1" pin="EN" pad="3"/>
@@ -875,14 +908,8 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 <connect gate="G$1" pin="IO4" pad="26"/>
 <connect gate="G$1" pin="IO5" pad="29"/>
 <connect gate="G$1" pin="RXD0" pad="34"/>
-<connect gate="G$1" pin="SCL/CLK" pad="20"/>
-<connect gate="G$1" pin="SCS/CMD" pad="19"/>
-<connect gate="G$1" pin="SD1/SD1" pad="22"/>
-<connect gate="G$1" pin="SDO/SD0" pad="21"/>
 <connect gate="G$1" pin="SENSOR_VN" pad="5"/>
 <connect gate="G$1" pin="SENSOR_VP" pad="4"/>
-<connect gate="G$1" pin="SHD/SD2" pad="17"/>
-<connect gate="G$1" pin="SWP/SD3" pad="18"/>
 <connect gate="G$1" pin="TXD0" pad="35"/>
 </connects>
 <technologies>
@@ -899,6 +926,7 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 </devices>
 </deviceset>
 <deviceset name="TPS63000DRCR" prefix="U">
+<description>TPS63000DRCR</description>
 <gates>
 <gate name="A" symbol="TPS63000DRC" x="0" y="0"/>
 </gates>
@@ -937,7 +965,7 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 </devices>
 </deviceset>
 <deviceset name="AP2112K-3.3TRG1" prefix="U">
-<description>AP2112 Series 0.6 A 3.3 V Fixed Output SMT LDO Linear Regulator - SOT23-5</description>
+<description>AP2112K-3.3TRG1</description>
 <gates>
 <gate name="G$1" symbol="AP2112K-3.3TRG1" x="0" y="0"/>
 </gates>
@@ -957,6 +985,34 @@ Source: http://www.molex.com/product/micro/87438.html</description>
 <attribute name="MP" value="AP2112K-3.3TRG1"/>
 <attribute name="PACKAGE" value="SOT-753 Diodes Inc."/>
 <attribute name="PRICE" value="None"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="SKRPABE010" prefix="S">
+<description>311020518</description>
+<gates>
+<gate name="G$1" symbol="SKRPABE010" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SMT(4.2X3.2)">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+<connect gate="G$1" pin="4" pad="4"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="DESCRIPTION" value="Switch Tactile 4.2 x 3.2mm SMT 1.57N Black Button Tactile Switch, SPST-NO 0.05 A 0.7mm" constant="no"/>
+<attribute name="HEIGHT" value="mm" constant="no"/>
+<attribute name="MANUFACTURER_NAME" value="ALPS" constant="no"/>
+<attribute name="MANUFACTURER_PART_NUMBER" value="SKRPABE010" constant="no"/>
+<attribute name="MOUSER_PART_NUMBER" value="688-SKRPAB" constant="no"/>
+<attribute name="MOUSER_PRICE-STOCK" value="https://www.mouser.com/Search/Refine.aspx?Keyword=688-SKRPAB" constant="no"/>
+<attribute name="RS_PART_NUMBER" value="9174087" constant="no"/>
+<attribute name="RS_PRICE-STOCK" value="http://uk.rs-online.com/web/p/products/9174087" constant="no"/>
 </technology>
 </technologies>
 </device>

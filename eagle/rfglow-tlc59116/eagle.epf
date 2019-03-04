@@ -1,6 +1,6 @@
 [Eagle]
 Version="09 03 01"
-Platform="Mac OS X"
+Platform="Linux"
 Globals="Globals"
 Desktop="Desktop"
 
@@ -9,18 +9,18 @@ AutoSaveProject=1
 UsedLibraryUrn="urn:adsk.eagle:library:371"
 UsedLibraryUrn="urn:adsk.eagle:library:8004883"
 UsedLibraryUrn="urn:adsk.eagle:library:8004261"
+UsedLibraryUrn="urn:adsk.eagle:library:165"
 UsedLibraryUrn="urn:adsk.eagle:library:8004989"
 UsedLibraryUrn="urn:adsk.eagle:library:8004395"
 UsedLibraryUrn="urn:adsk.eagle:library:8004595"
-UsedLibraryUrn="urn:adsk.eagle:library:165"
-UsedLibrary="/Users/kaoja01/Documents/EAGLE/projects/rfglow-esp32/Components.lbr"
+UsedLibrary="/home/jkao/EAGLE/projects/rfglow-esp32/rfglow-esp32.lbr"
 
 [Win_1]
 Type="Board Editor"
 Number=2
-File="/Users/kaoja01/Documents/EAGLE/projects/rfglow-esp32/PCB-Main.brd"
-View="-56.9116 -22.04 23.1486 77.9683"
-WireWidths=" 0.0762 0.1016 0.127 0.15 0.2 0.2032 0.254 0.3048 0.4064 0.508 0.6096 0.8128 1.016 1.27 2.54 0.1524"
+File="/home/jkao/EAGLE/projects/rfglow-esp32/PCB-Main.brd"
+View="-2.06289 -2.9307 70.1768 80.4096"
+WireWidths=" 0.0762 0.1016 0.127 0.15 0.2 0.2032 0.254 0.3048 0.508 0.6096 0.8128 1.016 1.27 2.54 0.1524 0.4064"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.65 0.7 0.75 0.8 0.85 0.9 1 0.6"
 ViaDiameters=" 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1 1.05 1.1 1.15 1.2 1.3 0"
@@ -62,8 +62,8 @@ Layer=1
 [Win_2]
 Type="Schematic Editor"
 Number=1
-File="/Users/kaoja01/Documents/EAGLE/projects/rfglow-esp32/PCB-Main.sch"
-View="3.06362 8.81181 275.217 163.743"
+File="/home/jkao/EAGLE/projects/rfglow-esp32/PCB-Main.sch"
+View="-18.7443 -5.9161 253.409 149.015"
 WireWidths=" 0.0762 0.1016 0.127 0.15 0.2 0.2032 0.254 0.3048 0.4064 0.508 0.6096 0.8128 1.016 1.27 2.54 0.1524"
 PadDiameters=" 0.254 0.3048 0.4064 0.6096 0.8128 1.016 1.27 1.4224 1.6764 1.778 1.9304 2.1844 2.54 3.81 6.4516 0"
 PadDrills=" 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.65 0.7 0.75 0.8 0.85 0.9 1 0.6"
@@ -102,6 +102,7 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
+Views=" 1: -18.7443 -5.9161 253.409 149.015"
 Sheet="1"
 
 [Win_3]
@@ -109,7 +110,7 @@ Type="Control Panel"
 Number=0
 
 [Desktop]
-Screen="3440 2720"
+Screen="2560 1600"
 Window="Win_1"
 Window="Win_2"
 Window="Win_3"
