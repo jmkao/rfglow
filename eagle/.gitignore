@@ -2,3 +2,4 @@
 *.job
 *.pro
 *.zip
+**/job

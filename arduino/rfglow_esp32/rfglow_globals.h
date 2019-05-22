@@ -29,12 +29,3 @@ const String log_prefix = String("RFG: ");
 extern volatile bool adcDone;
 
 extern unsigned long lastCmdMs;
-
-extern unsigned int mH;
-extern unsigned int mS;
-extern unsigned int mB;
-
-extern unsigned int ma;
-
-extern boolean isAutoCycle;
-extern unsigned long prevMs;

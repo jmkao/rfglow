@@ -13,20 +13,17 @@ void initButtons() {
 
 void clickAction() {
   DEBUG_PRINTLN("Single click");
-  isAutoCycle = false;
-  mH = (mH + 60) % 360;
-  setHSV(mH, mS, mB);
+  incrementHue();
 }
 
 void doubleClickAction() {
   DEBUG_PRINTLN("Double click");
-  isAutoCycle = !isAutoCycle;
+  toggleAutocycle();
 }
 
 void longPressAction() {
   DEBUG_PRINTLN("Long press");
-  mB = (mB + 60) % 240;
-  setHSV(mH, mS, mB);
+  incrementBrightness();
 }
 
 void buttonTick() {

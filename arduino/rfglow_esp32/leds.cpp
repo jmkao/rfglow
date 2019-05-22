@@ -4,6 +4,17 @@
 TLC59116Manager tlcmanager;
 TLC59116* driver = NULL;
 
+// LED state
+unsigned int mH = 0;
+unsigned int mS = 255;
+unsigned int mB = 15;
+
+unsigned int ma = 61;
+
+boolean isAutoCycle = false;
+
+unsigned long prevMs = 0;
+
 void initLEDs() {
   // Init TLC59116
   tlcmanager.init();
@@ -13,6 +24,35 @@ void initLEDs() {
   driver->enable_outputs(true);
   DEBUG_PRINTLN("tlcmanager enable_outputs");
   driver->set_milliamps(ma);
+}
+
+void ledTick() {
+  unsigned long curMs = millis();
+
+  if (isAutoCycle) {
+    if (curMs - prevMs > AUTO_INTERVAL) {
+      mH = (mH + 60) % 360;
+      setHSV(mH, mS, mB);
+      prevMs = curMs;
+    }
+  } else {
+    prevMs = curMs;
+  } 
+}
+
+void incrementHue() {
+  isAutoCycle = false;
+  mH = (mH + 60) % 360;
+  setHSV(mH, mS, mB);
+}
+
+void toggleAutocycle() {
+  isAutoCycle = !isAutoCycle;
+}
+
+void incrementBrightness() {
+  mB = (mB + 60) % 240;
+  setHSV(mH, mS, mB);
 }
 
 void setupFlashLED() {
@@ -28,22 +68,11 @@ void setupFlashLED() {
 }
 
 void setHSV(unsigned int h, unsigned int s, unsigned int v) {
-  //DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
-  setHSVRaw(h,s,v);
-}
-
-void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
-  
-  //DEBUG_PRINTLN("setHSVRaw() called: "+h+" "+s+" "+v);
-  
-  unsigned char r, g, b;
-  unsigned char region, remainder, p, q, t, maLevel, newMa;
-
-  maLevel = h / 360;
+  DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
+  unsigned char maLevel = h / 360;
   h = h % 360;
 
-  //DEBUG_PRINTLN("maLevel = "+maLevel+", h = "+h);
-
+  unsigned char newMa;
   switch (maLevel) {
     case 1:
       newMa = 61;
@@ -56,6 +85,21 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v) {
       break;
     default:
       newMa = 120;
+  }
+  //DEBUG_PRINTLN("maLevel = "+maLevel+", h = "+h);
+
+  setHSVRaw(h,s,v,newMa);
+}
+
+void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int newMa) {
+  
+  //DEBUG_PRINTLN("setHSVRaw() called: "+h+" "+s+" "+v+" "+newMa);
+  
+  unsigned char r, g, b;
+  unsigned char region, remainder, p, q, t;
+
+  if (newMa < 0) {
+    newMa = ma;
   }
 
   if (v == 0) {

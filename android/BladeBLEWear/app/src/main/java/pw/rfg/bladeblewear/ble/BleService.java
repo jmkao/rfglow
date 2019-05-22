@@ -170,12 +170,14 @@ public class BleService extends Service {
         this.updateBleStatus("Initializing");
         bleScanner = bleAdapter.getBluetoothLeScanner();
 
-//        this.updateBleStatus("Scanning");
-//        bleScanner.startScan(scanFilters, scanSettings, scanCallback);
+        this.updateBleStatus("Scanning");
+        bleScanner.startScan(scanFilters, scanSettings, scanCallback);
 
+        /*
         this.updateBleStatus("Waiting");
         BluetoothDevice device = bleAdapter.getRemoteDevice("FA:A7:47:F5:81:F3");
         this.bleGatt = device.connectGatt(BleService.this, GATT_AUTOCONNECT, this.gattCallback);
+        */
     }
 
     private void cleanup() {
