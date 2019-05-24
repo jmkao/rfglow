@@ -49,7 +49,7 @@ public class BleService extends Service {
 
     private static final ScanFilter scanFilter = new ScanFilter.Builder()
             .setDeviceName(DEVICE_NAME)
-            .setServiceUuid(SERVICE_UUID)
+            //.setServiceUuid(SERVICE_UUID)
             .build();
     private static final ScanFilter[] scanFilterArray = {scanFilter};
     private static final List<ScanFilter> scanFilters = Arrays.asList(scanFilterArray);

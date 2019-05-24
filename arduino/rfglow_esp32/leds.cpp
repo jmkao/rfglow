@@ -1,7 +1,7 @@
 #include "leds.h"
 
 // TLC59116 Setup
-TLC59116Manager tlcmanager;
+TLC59116Manager tlcmanager(Wire, 30000L);
 TLC59116* driver = NULL;
 
 // LED state
@@ -10,6 +10,11 @@ unsigned int mS = 255;
 unsigned int mB = 15;
 
 unsigned int ma = 61;
+
+// Targets for fading
+unsigned int target_hue = 0, target_saturation = 0, target_brightness = 0, target_fade_ms = 0;
+long fade_dH = 0, fade_dS = 0, fade_dV = 0;
+unsigned long fade_start_ms = 0;
 
 boolean isAutoCycle = false;
 
@@ -50,6 +55,10 @@ void toggleAutocycle() {
   isAutoCycle = !isAutoCycle;
 }
 
+void stopAutocycle() {
+  isAutoCycle = false;
+}
+
 void incrementBrightness() {
   mB = (mB + 60) % 240;
   setHSV(mH, mS, mB);
@@ -64,15 +73,31 @@ void setupFlashLED() {
   delay(50);
   driver->pattern(0b0000000000000000);
 
-  driver->enable_outputs(false);  
+  // driver->enable_outputs(false);  
 }
+
+void fadeTo(unsigned int h, unsigned int s, unsigned int v, unsigned int ms) {
+  DEBUG_PRINTLN("Fade requested. Not yet implemented.");
+}
+
 
 void setHSV(unsigned int h, unsigned int s, unsigned int v) {
   DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
   unsigned char maLevel = h / 360;
   h = h % 360;
 
-  unsigned char newMa;
+  //DEBUG_PRINTLN("maLevel = "+maLevel+", h = "+h);
+
+  setHSVRaw(h,s,v,maLevel);
+}
+
+void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int maLevel) {
+  
+  //DEBUG_PRINTLN("setHSVRaw() called: "+h+" "+s+" "+v+" "+maLevel);
+  
+  unsigned char r, g, b;
+  unsigned char region, remainder, p, q, t, newMa;
+
   switch (maLevel) {
     case 1:
       newMa = 61;
@@ -83,23 +108,11 @@ void setHSV(unsigned int h, unsigned int s, unsigned int v) {
     case 3:
       newMa = 10;
       break;
-    default:
+    case 0:
       newMa = 120;
-  }
-  //DEBUG_PRINTLN("maLevel = "+maLevel+", h = "+h);
-
-  setHSVRaw(h,s,v,newMa);
-}
-
-void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int newMa) {
-  
-  //DEBUG_PRINTLN("setHSVRaw() called: "+h+" "+s+" "+v+" "+newMa);
-  
-  unsigned char r, g, b;
-  unsigned char region, remainder, p, q, t;
-
-  if (newMa < 0) {
-    newMa = ma;
+      break;
+    default:
+      newMa = ma;
   }
 
   if (v == 0) {
@@ -176,9 +189,9 @@ void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
     driver->pattern(0x0000);
     driver->enable_outputs(false);
   } else {
-    if (!driver->is_enabled()) {
+    // if (!driver->is_enabled()) {
       driver->enable_outputs(true);
-    }
+    // }
     
     byte leds[16];
     

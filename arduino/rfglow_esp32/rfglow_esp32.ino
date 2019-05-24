@@ -3,6 +3,8 @@
 #include "leds.h"
 #include "ble.h"
 
+#include <driver/i2c.h>
+
 void setup() {
   setCpuFrequencyMhz(80);
   
@@ -10,6 +12,12 @@ void setup() {
     Serial.begin(115200);
     DEBUG_PRINTLN("Startup esp32");
   #endif
+
+  if (i2c_filter_enable(I2C_NUM_0, 1) == ESP_OK) {
+    DEBUG_PRINTLN("Enabled ESP32 I2C filter");
+  } else {
+    DEBUG_PRINTLN("ESP32 I2C filter failed");
+  }
 
   initLEDs();
 
@@ -35,7 +43,9 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly
-  buttonTick();
+  if (!isBleConnected()) {
+    buttonTick();
+  }
   ledTick();
 }
 
