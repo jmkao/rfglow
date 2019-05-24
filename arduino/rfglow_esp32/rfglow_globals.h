@@ -6,6 +6,9 @@
 // Color change interval for button-controlled auto cycling
 #define AUTO_INTERVAL 100
 
+// Color update interval for BLE commands
+#define LED_TICK_INTERVAL 10
+
 /*** Development Macros ***/
 // Uncomment to enable debug logging
 #define RFG_DEBUG

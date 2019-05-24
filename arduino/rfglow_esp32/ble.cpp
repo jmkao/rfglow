@@ -19,15 +19,12 @@ class BleRxCallbacks: public BLECharacteristicCallbacks {
         unsigned int target_brightness = data[3];
 
         if (len == 4) {
-          setHSV(target_hue, target_saturation, target_brightness);
+          switchLedTo(target_hue, target_saturation, target_brightness);
           return;
         }
 
-        unsigned char maLevel = target_hue / 360;
-        target_hue = target_hue % 360;
-
         unsigned int target_fade_ms = (data[4] << 8) | data[5];
-        fadeTo(target_hue, target_saturation, target_brightness, target_fade_ms);
+        fadeLedTo(target_hue, target_saturation, target_brightness, target_fade_ms);
       } else {
         DEBUG_PRINTLN("Invalid BLE command length, ignoring.");
       }

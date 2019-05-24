@@ -5,14 +5,15 @@ TLC59116Manager tlcmanager(Wire, 30000L);
 TLC59116* driver = NULL;
 
 // LED state
-unsigned int mH = 0;
-unsigned int mS = 255;
-unsigned int mB = 15;
+int mH = 0;
+int mS = 255;
+int mB = 0;
 
 unsigned int ma = 61;
 
 // Targets for fading
-unsigned int target_hue = 0, target_saturation = 0, target_brightness = 0, target_fade_ms = 0;
+unsigned int target_hue = mH, target_saturation = mS, target_brightness = mB, target_fade_ms = 0;
+int target_maLevel = 1;
 long fade_dH = 0, fade_dS = 0, fade_dV = 0;
 unsigned long fade_start_ms = 0;
 
@@ -34,21 +35,53 @@ void initLEDs() {
 void ledTick() {
   unsigned long curMs = millis();
 
+  if (curMs - prevMs < LED_TICK_INTERVAL) {
+    return;
+  }
+
   if (isAutoCycle) {
     if (curMs - prevMs > AUTO_INTERVAL) {
-      mH = (mH + 60) % 360;
-      setHSV(mH, mS, mB);
-      prevMs = curMs;
+      target_hue = (target_hue + 60) % 360;
     }
+  }
+
+  if (fade_start_ms == 0 || target_fade_ms == 0  // No fade in progress
+      || curMs - fade_start_ms > 60000  //Fade timed out, more than 60s elapsed
+      || curMs - fade_start_ms > target_fade_ms  //Fade reached the end
+      ) {
+    mH = target_hue;
+    mS = target_saturation;
+    mB = target_brightness;
+    fade_start_ms = 0;
+    target_fade_ms = 0;
+  } else if (target_fade_ms == 65535) {
+    // Code for UO decay
   } else {
-    prevMs = curMs;
-  } 
+    // In the middle of a linear fade
+    long dT = curMs - fade_start_ms;
+    long ratio = 10000 - (dT * 10000 / target_fade_ms);
+    DEBUG_PRINTLN("Fade at "+ratio/100+"%");
+    int dH = ratio * fade_dH / 10000;
+    int dS = ratio * fade_dS / 10000;
+    int dV = ratio * fade_dV / 10000;
+
+    mH = (int)target_hue - dH;
+    if (mH >= 360) {
+      mH -= 360;
+    } else if (mH < 0) {
+      mH += 360;
+    }
+    mS = target_saturation - dS;
+    mB = target_brightness - dV;
+  }
+
+  setHSVRaw(mH, mS, mB, target_maLevel);
+  prevMs = curMs;
 }
 
 void incrementHue() {
   isAutoCycle = false;
-  mH = (mH + 60) % 360;
-  setHSV(mH, mS, mB);
+  target_hue = (target_hue + 60) % 360;
 }
 
 void toggleAutocycle() {
@@ -60,8 +93,7 @@ void stopAutocycle() {
 }
 
 void incrementBrightness() {
-  mB = (mB + 60) % 240;
-  setHSV(mH, mS, mB);
+  target_brightness = (target_brightness + 60) % 240;
 }
 
 void setupFlashLED() {
@@ -76,11 +108,43 @@ void setupFlashLED() {
   // driver->enable_outputs(false);  
 }
 
-void fadeTo(unsigned int h, unsigned int s, unsigned int v, unsigned int ms) {
-  DEBUG_PRINTLN("Fade requested. Not yet implemented.");
+void switchLedTo(unsigned int h, unsigned int s, unsigned int v) {
+  target_hue = h;
+  target_saturation = s;
+  target_brightness = v;
+
+  target_maLevel = target_hue / 360;
+  target_hue = target_hue % 360;
+
+  target_fade_ms = 0;
+  fade_start_ms = 0;
 }
 
+void fadeLedTo(unsigned int h, unsigned int s, unsigned int v, unsigned int fade_ms) {
+  target_hue = h;
+  target_saturation = s;
+  target_brightness = v;
 
+  target_maLevel = target_hue / 360;
+  target_hue = target_hue % 360;
+
+  target_fade_ms = fade_ms;
+  fade_start_ms = millis();
+
+  fade_dH = (int)target_hue - (int)mH;
+  if (fade_dH > 180) {
+    fade_dH -= 360;
+  } else if (fade_dH <= -180) {
+    fade_dH += 360;
+  }
+      
+  fade_dS = (int)target_saturation - (int)mS;
+  fade_dV = (int)target_brightness - (int)mB;
+  DEBUG_PRINTLN("Fade deltas dH, dS, dV = "+fade_dH+", "+fade_dS+", "+fade_dV);
+
+}
+
+/*
 void setHSV(unsigned int h, unsigned int s, unsigned int v) {
   DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
   unsigned char maLevel = h / 360;
@@ -90,6 +154,7 @@ void setHSV(unsigned int h, unsigned int s, unsigned int v) {
 
   setHSVRaw(h,s,v,maLevel);
 }
+*/
 
 void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int maLevel) {
   
@@ -183,15 +248,17 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int maLevel) {
 
 
 void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
-  //DEBUG_PRINTLN("setRGBRaw() called: "+r+" "+g+" "+b);
   
   if (r==0 & g==0 & b==0) {
     driver->pattern(0x0000);
-    driver->enable_outputs(false);
+    if (driver->is_enabled()) {
+      driver->enable_outputs(false);
+    }
   } else {
-    // if (!driver->is_enabled()) {
+    DEBUG_PRINTLN("setRGBRaw() called: "+r+" "+g+" "+b);
+    if (!driver->is_enabled()) {
       driver->enable_outputs(true);
-    // }
+    }
     
     byte leds[16];
     
