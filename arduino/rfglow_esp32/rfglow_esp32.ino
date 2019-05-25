@@ -5,6 +5,9 @@
 
 #include <driver/i2c.h>
 
+// #include <painlessMesh.h>
+// painlessMesh  mesh;
+
 void setup() {
   setCpuFrequencyMhz(80);
   
