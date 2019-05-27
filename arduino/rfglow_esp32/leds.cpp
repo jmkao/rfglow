@@ -97,11 +97,11 @@ void incrementBrightness() {
 }
 
 void setupFlashLED() {
-  driver->pattern(0b1100000000000000);
+  driver->pattern(0b0100000000000000);
   delay(50);
-  driver->pattern(0b0000011000000000);
+  driver->pattern(0b0000001000000000);
   delay(50);
-  driver->pattern(0b0000000000011000);
+  driver->pattern(0b0000000000001000);
   delay(50);
   driver->pattern(0b0000000000000000);
 

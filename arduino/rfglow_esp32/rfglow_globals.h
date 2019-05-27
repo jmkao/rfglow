@@ -9,6 +9,9 @@
 // Color update interval for BLE commands
 #define LED_TICK_INTERVAL 10
 
+// Interval between mesh commands to keep BLE off
+#define WIFI_BLE_STOP_INTERVAL 100
+
 /*** Development Macros ***/
 // Uncomment to enable debug logging
 #define RFG_DEBUG

@@ -2,11 +2,9 @@
 #include "buttons.h"
 #include "leds.h"
 #include "ble.h"
+#include "mesh.h"
 
 #include <driver/i2c.h>
-
-// #include <painlessMesh.h>
-// painlessMesh  mesh;
 
 void setup() {
   setCpuFrequencyMhz(80);
@@ -35,10 +33,11 @@ void setup() {
   } else {
     setRGBRaw(15, 0, 0);
   }
-  delay(500);
+  delay(200);
 
   initButtons();
   initBLE();
+  initMesh();
   
   // Flash to indicate we're ready
   setupFlashLED();
@@ -50,6 +49,7 @@ void loop() {
     buttonTick();
   }
   ledTick();
+  meshTick();
 }
 
 static int vbatRead() {

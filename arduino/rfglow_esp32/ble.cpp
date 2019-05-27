@@ -2,6 +2,8 @@
 #include "leds.h"
 
 BLEServer *pServer = NULL;
+BLEService *pService = NULL;
+BLEAdvertising *pAdvertising  = NULL;
 
 boolean isConnected = false;
 
@@ -50,7 +52,7 @@ void initBLE() {
   pServer = BLEDevice::createServer();
 
   // Create the BLE Service
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  pService = pServer->createService(SERVICE_UUID);
   BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
     RX_CHAR_UUID,
     BLECharacteristic::PROPERTY_WRITE
@@ -60,10 +62,20 @@ void initBLE() {
   pRxCharacteristic->setCallbacks(new BleRxCallbacks());
   pService->start();
 
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
+  pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
 }
 
 boolean isBleConnected() {
   return isConnected;
+}
+
+void stopBLE() {
+  pAdvertising->stop();
+  pService->stop();
+}
+
+void startBLE() {
+  pService->start();
+  pAdvertising->start();
 }
