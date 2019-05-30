@@ -7,10 +7,10 @@
 #include <driver/i2c.h>
 
 void setup() {
-  setCpuFrequencyMhz(80);
+  //setCpuFrequencyMhz(160);
   
   #ifdef RFG_DEBUG
-    Serial.begin(115200);
+    Serial.begin(230400);
     DEBUG_PRINTLN("Startup esp32");
   #endif
 
@@ -33,12 +33,11 @@ void setup() {
   } else {
     setRGBRaw(15, 0, 0);
   }
-  delay(200);
 
   initButtons();
   initBLE();
   initMesh();
-  
+
   // Flash to indicate we're ready
   setupFlashLED();
 }

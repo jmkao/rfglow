@@ -12,7 +12,8 @@ int mB = 0;
 unsigned int ma = 61;
 
 // Targets for fading
-unsigned int target_hue = mH, target_saturation = mS, target_brightness = mB, target_fade_ms = 0;
+target_color target = {mH, mS, mB, 0};
+
 int target_maLevel = 1;
 long fade_dH = 0, fade_dS = 0, fade_dV = 0;
 unsigned long fade_start_ms = 0;
@@ -41,38 +42,38 @@ void ledTick() {
 
   if (isAutoCycle) {
     if (curMs - prevMs > AUTO_INTERVAL) {
-      target_hue = (target_hue + 60) % 360;
+      target.h = (target.h + 60) % 360;
     }
   }
 
-  if (fade_start_ms == 0 || target_fade_ms == 0  // No fade in progress
+  if (fade_start_ms == 0 || target.ms == 0  // No fade in progress
       || curMs - fade_start_ms > 60000  //Fade timed out, more than 60s elapsed
-      || curMs - fade_start_ms > target_fade_ms  //Fade reached the end
+      || curMs - fade_start_ms > target.ms  //Fade reached the end
       ) {
-    mH = target_hue;
-    mS = target_saturation;
-    mB = target_brightness;
+    mH = target.h;
+    mS = target.s;
+    mB = target.v;
     fade_start_ms = 0;
-    target_fade_ms = 0;
-  } else if (target_fade_ms == 65535) {
+    target.ms = 0;
+  } else if (target.ms == 65535) {
     // Code for UO decay
   } else {
     // In the middle of a linear fade
     long dT = curMs - fade_start_ms;
-    long ratio = 10000 - (dT * 10000 / target_fade_ms);
-    DEBUG_PRINTLN("Fade at "+ratio/100+"%");
+    long ratio = 10000 - (dT * 10000 / target.ms);
+    //DEBUG_PRINTLN("Fade at "+ratio/100+"%");
     int dH = ratio * fade_dH / 10000;
     int dS = ratio * fade_dS / 10000;
     int dV = ratio * fade_dV / 10000;
 
-    mH = (int)target_hue - dH;
+    mH = (int)target.h - dH;
     if (mH >= 360) {
       mH -= 360;
     } else if (mH < 0) {
       mH += 360;
     }
-    mS = target_saturation - dS;
-    mB = target_brightness - dV;
+    mS = target.s - dS;
+    mB = target.v - dV;
   }
 
   setHSVRaw(mH, mS, mB, target_maLevel);
@@ -81,7 +82,7 @@ void ledTick() {
 
 void incrementHue() {
   isAutoCycle = false;
-  target_hue = (target_hue + 60) % 360;
+  target.h = (target.h + 60) % 360;
 }
 
 void toggleAutocycle() {
@@ -93,55 +94,77 @@ void stopAutocycle() {
 }
 
 void incrementBrightness() {
-  target_brightness = (target_brightness + 60) % 240;
+  target.v = (target.v + 60) % 240;
 }
 
 void setupFlashLED() {
-  driver->pattern(0b0100000000000000);
+  driver->set_milliamps(10);
+  driver->pattern(0b1000000000000000);
   delay(50);
-  driver->pattern(0b0000001000000000);
+  driver->pattern(0b0000010000000000);
   delay(50);
-  driver->pattern(0b0000000000001000);
+  driver->pattern(0b0000000000010000);
   delay(50);
   driver->pattern(0b0000000000000000);
+  driver->set_milliamps(ma);
 
   // driver->enable_outputs(false);  
 }
 
 void switchLedTo(unsigned int h, unsigned int s, unsigned int v) {
-  target_hue = h;
-  target_saturation = s;
-  target_brightness = v;
+  DEBUG_PRINTLN("switchLedTo() called: "+h+" "+s+" "+v);
+  target.h = h;
+  target.s = s;
+  target.v = v;
 
-  target_maLevel = target_hue / 360;
-  target_hue = target_hue % 360;
+  target_maLevel = target.h / 360;
+  target.h = target.h % 360;
 
-  target_fade_ms = 0;
+  target.ms = 0;
   fade_start_ms = 0;
 }
 
 void fadeLedTo(unsigned int h, unsigned int s, unsigned int v, unsigned int fade_ms) {
-  target_hue = h;
-  target_saturation = s;
-  target_brightness = v;
+  DEBUG_PRINTLN("fadeLedTo() called: "+h+" "+s+" "+v+" "+fade_ms);
+  target.h = h;
+  target.s = s;
+  target.v = v;
 
-  target_maLevel = target_hue / 360;
-  target_hue = target_hue % 360;
+  target_maLevel = target.h / 360;
+  target.h = target.h % 360;
 
-  target_fade_ms = fade_ms;
+  target.ms = fade_ms;
   fade_start_ms = millis();
 
-  fade_dH = (int)target_hue - (int)mH;
+  fade_dH = (int)target.h - (int)mH;
   if (fade_dH > 180) {
     fade_dH -= 360;
   } else if (fade_dH <= -180) {
     fade_dH += 360;
   }
       
-  fade_dS = (int)target_saturation - (int)mS;
-  fade_dV = (int)target_brightness - (int)mB;
-  DEBUG_PRINTLN("Fade deltas dH, dS, dV = "+fade_dH+", "+fade_dS+", "+fade_dV);
+  fade_dS = (int)target.s - (int)mS;
+  fade_dV = (int)target.v - (int)mB;
+  //DEBUG_PRINTLN("Fade deltas dH, dS, dV = "+fade_dH+", "+fade_dS+", "+fade_dV);
 
+}
+
+target_color getCurrentTarget() {
+  unsigned long curMs = millis();
+  if (fade_start_ms == 0 || target.ms == 0  // No fade in progress
+      || curMs - fade_start_ms > 60000  //Fade timed out, more than 60s elapsed
+      || curMs - fade_start_ms > target.ms  //Fade reached the end
+      ) {
+    target_color currentTarget = {target.h, target.s, target.v, 0};
+    return currentTarget;
+  } else {
+    // We're in the middle of the fade
+    unsigned long elapsed_fade_ms = curMs - fade_start_ms;
+    unsigned long remaining_fade_ms = target.ms - elapsed_fade_ms;
+
+    target_color currentTarget = {target.h, target.s, target.v, remaining_fade_ms};
+    return currentTarget;
+  }
 }
 
 /*
@@ -255,7 +278,7 @@ void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
       driver->enable_outputs(false);
     }
   } else {
-    DEBUG_PRINTLN("setRGBRaw() called: "+r+" "+g+" "+b);
+    //DEBUG_PRINTLN("setRGBRaw() called: "+r+" "+g+" "+b);
     if (!driver->is_enabled()) {
       driver->enable_outputs(true);
     }

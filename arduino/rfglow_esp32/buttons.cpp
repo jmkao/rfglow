@@ -1,5 +1,6 @@
 #include "buttons.h"
 #include "leds.h"
+#include "mesh.h"
 
 OneButton button(BUTTON_PIN, true);
 
@@ -14,6 +15,8 @@ void initButtons() {
 void clickAction() {
   DEBUG_PRINTLN("Single click");
   incrementHue();
+  target_color target = getCurrentTarget();
+  sendCommandToMesh(target.h, target.s, target.v, target.ms);
 }
 
 void doubleClickAction() {
@@ -24,6 +27,8 @@ void doubleClickAction() {
 void longPressAction() {
   DEBUG_PRINTLN("Long press");
   incrementBrightness();
+  target_color target = getCurrentTarget();
+  sendCommandToMesh(target.h, target.s, target.v, target.ms);
 }
 
 void buttonTick() {

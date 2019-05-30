@@ -14,3 +14,4 @@ void stopBLE();
 void startBLE();
 
 boolean isBleConnected();
+boolean isBleStarted();
