@@ -1,13 +1,15 @@
 #include "ble.h"
 #include "leds.h"
+#include "mesh.h"
 
 BLEServer *pServer = NULL;
 BLEService *pService = NULL;
 BLEAdvertising *pAdvertising  = NULL;
 
 boolean isConnected = false;
+boolean isStarted = false;
 
-class BleRxCallbacks: public BLECharacteristicCallbacks {
+static class : public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
       std::string rxValue = pCharacteristic->getValue();
       uint16_t len = rxValue.length();
@@ -21,19 +23,21 @@ class BleRxCallbacks: public BLECharacteristicCallbacks {
         unsigned int target_brightness = data[3];
 
         if (len == 4) {
+          sendCommandToMesh(target_hue, target_saturation, target_brightness, 0);
           switchLedTo(target_hue, target_saturation, target_brightness);
           return;
         }
 
         unsigned int target_fade_ms = (data[4] << 8) | data[5];
+        sendCommandToMesh(target_hue, target_saturation, target_brightness, target_fade_ms);
         fadeLedTo(target_hue, target_saturation, target_brightness, target_fade_ms);
       } else {
         DEBUG_PRINTLN("Invalid BLE command length, ignoring.");
       }
     }
-};
+} bleRxCallbacks;
 
-class BleServerCallbacks: public BLEServerCallbacks {
+static class : public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
     isConnected = true;
     stopAutocycle();
@@ -42,9 +46,11 @@ class BleServerCallbacks: public BLEServerCallbacks {
   void onDisconnect(BLEServer* pServer) {
     isConnected = false;
   }
-};
+} bleServerCallbacks;
 
 void initBLE() {
+  DEBUG_PRINTLN("Init BLE");
+  
   // Create the BLE Device
   BLEDevice::init("RFGLOW");
 
@@ -58,12 +64,14 @@ void initBLE() {
     BLECharacteristic::PROPERTY_WRITE
 	);
 
-  pServer->setCallbacks(new BleServerCallbacks());
-  pRxCharacteristic->setCallbacks(new BleRxCallbacks());
+  pServer->setCallbacks(&bleServerCallbacks);
+  pRxCharacteristic->setCallbacks(&bleRxCallbacks);
   pService->start();
 
   pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
+
+  isStarted = true;
 }
 
 boolean isBleConnected() {
@@ -71,11 +79,25 @@ boolean isBleConnected() {
 }
 
 void stopBLE() {
-  pAdvertising->stop();
-  pService->stop();
+  DEBUG_PRINTLN("Stopping BLE");
+  // pAdvertising->stop();
+  //pService->stop();
+  if (BLEDevice::getInitialized()) {
+    BLEDevice::deinit();
+  }
+  isStarted = false;
 }
 
 void startBLE() {
-  pService->start();
-  pAdvertising->start();
+  DEBUG_PRINTLN("Starting BLE");
+  //pService->start();
+  //pAdvertising->start();
+  if (!BLEDevice::getInitialized()) {
+    initBLE();
+  }
+  isStarted = true;
+}
+
+boolean isBleStarted() {
+  return isStarted;
 }

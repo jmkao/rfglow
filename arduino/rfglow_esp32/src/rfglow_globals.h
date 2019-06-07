@@ -10,7 +10,7 @@
 #define LED_TICK_INTERVAL 10
 
 // Interval between mesh commands to keep BLE off
-#define WIFI_BLE_STOP_INTERVAL 100
+#define WIFI_BLE_STOP_INTERVAL 5000
 
 /*** Development Macros ***/
 // Uncomment to enable debug logging
@@ -28,6 +28,15 @@ const String log_prefix = String("RFG: ");
 /*** Hardware Configuration ***/
 #define BUTTON_PIN 23
 #define VBAT_ADC_PIN 35
+
+// Global typedefs
+struct target_color {
+  unsigned int h;
+  unsigned int s;
+  unsigned int v;
+  unsigned int ms;
+};
+
 
 /*** Global Variable Definitions ***/
 
