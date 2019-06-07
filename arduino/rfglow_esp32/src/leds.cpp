@@ -249,7 +249,7 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int maLevel) {
 
 void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
   
-  if (r==0 & g==0 & b==0) {
+  if (r==0 && g==0 && b==0) {
     driver->pattern(0x0000);
     if (driver->is_enabled()) {
       driver->enable_outputs(false);
