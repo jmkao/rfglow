@@ -5,6 +5,7 @@
 #include <painlessMesh.h>
 
 void initMesh();
+void reinitMeshAPOnly();
 
 void meshTick();
 boolean isMeshMasterPresent();

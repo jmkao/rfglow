@@ -1,5 +1,4 @@
 #include "main.h"
-#include <Arduino.h>
 
 #include "leds.h"
 #include "buttons.h"
@@ -35,11 +34,11 @@ void setup() {
   } else {
     setRGBRaw(15, 0, 0);
   }
-  delay(200);
+  //delay(200);
 
-  initButtons();
-  initBLE();
   initMesh();
+  initBLE();
+  initButtons();
   
   // Flash to indicate we're ready
   setupFlashLED();

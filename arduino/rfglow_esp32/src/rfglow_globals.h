@@ -31,10 +31,10 @@ const String log_prefix = String("RFG: ");
 
 // Global typedefs
 struct target_color {
-  unsigned int h;
-  unsigned int s;
-  unsigned int v;
-  unsigned int ms;
+  int h;
+  int s;
+  int v;
+  unsigned long ms;
 };
 
 

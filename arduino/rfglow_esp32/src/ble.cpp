@@ -39,11 +39,14 @@ static class : public BLECharacteristicCallbacks {
 
 static class : public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
+    DEBUG_PRINTLN("BLE Client Connected");
     isConnected = true;
     stopAutocycle();
+    reinitMeshAPOnly();
   };
  
   void onDisconnect(BLEServer* pServer) {
+    DEBUG_PRINTLN("BLE Client Disconnected");
     isConnected = false;
   }
 } bleServerCallbacks;
@@ -53,6 +56,10 @@ void initBLE() {
   
   // Create the BLE Device
   BLEDevice::init("RFGLOW");
+  ESP_ERROR_CHECK(esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_ADV, ESP_PWR_LVL_N0));
+  ESP_ERROR_CHECK(esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, ESP_PWR_LVL_N0));
+  BLEDevice::setPower(ESP_PWR_LVL_N0);
+
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();

@@ -7,7 +7,8 @@
 
 painlessMesh mesh;
 
-unsigned long lastMeshCmdMs = 0;
+long lastMeshCmdMs = INT32_MIN;
+boolean isAPOnly = false;
 
 void receivedCallback(uint32_t from, String &msg) {
   unsigned int tH, tS, tV, tMS;
@@ -59,13 +60,25 @@ void receivedCallback(uint32_t from, String &msg) {
 void initMesh() {
   // mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE );
   mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | MSG_TYPES | REMOTE );
-  mesh.init("RFGLOW", "rfglow3939");
-  int status = esp_wifi_set_protocol( WIFI_IF_AP, WIFI_PROTOCOL_LR );
-  DEBUG_PRINTLN("Set WIFI_PROTOCOL_LR AP Status: "+status);
-  status = esp_wifi_set_protocol( WIFI_IF_STA, WIFI_PROTOCOL_LR );
-  DEBUG_PRINTLN("Set WIFI_PROTOCOL_LR STA Status: "+status);
+  mesh.init("RFGLOW", "rfglow3939", 5555, WIFI_MODE_APSTA);
+  ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_AP, WIFI_PROTOCOL_11B));
+  ESP_ERROR_CHECK_WITHOUT_ABORT(esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11B));
+  ESP_ERROR_CHECK(esp_wifi_set_bandwidth(WIFI_IF_AP, WIFI_BW_HT20));
+  ESP_ERROR_CHECK_WITHOUT_ABORT(esp_wifi_set_bandwidth(WIFI_IF_STA, WIFI_BW_HT20));
+
 
   mesh.onReceive(&receivedCallback);
+}
+
+void reinitMeshAPOnly() {
+  if (!isAPOnly) {
+    DEBUG_PRINTLN("Re-initialize mesh to AP only");
+    mesh.stop();
+    mesh.init("RFGLOW", "rfglow3939", 5555, WIFI_MODE_AP);
+    isAPOnly = true;
+    ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_AP, WIFI_PROTOCOL_11B));
+    ESP_ERROR_CHECK(esp_wifi_set_bandwidth(WIFI_IF_AP, WIFI_BW_HT20));
+  }
 }
 
 void meshTick() {
