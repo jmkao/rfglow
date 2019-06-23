@@ -13,6 +13,8 @@
 // Interval between mesh commands to keep BLE off
 #define WIFI_BLE_STOP_INTERVAL 5000
 
+#define WIFI_CHANNEL 11
+
 /*** Development Macros ***/
 // Uncomment to enable debug logging
 #define RFG_DEBUG

@@ -42,7 +42,6 @@ static class : public BLEServerCallbacks {
     DEBUG_PRINTLN("BLE Client Connected");
     isConnected = true;
     stopAutocycle();
-    reinitMeshAPOnly();
   };
  
   void onDisconnect(BLEServer* pServer) {
@@ -59,7 +58,6 @@ void initBLE() {
   ESP_ERROR_CHECK(esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_ADV, ESP_PWR_LVL_N0));
   ESP_ERROR_CHECK(esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, ESP_PWR_LVL_N0));
   BLEDevice::setPower(ESP_PWR_LVL_N0);
-
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();
