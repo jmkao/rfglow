@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ArduinoTrace.h>
 
 #pragma once
 
@@ -41,6 +42,6 @@ struct target_color {
 /*** Global Variable Definitions ***/
 
 // Voltage indicator setup
-extern volatile bool adcDone;
+extern bool adcDone;
 
 extern unsigned long lastCmdMs;

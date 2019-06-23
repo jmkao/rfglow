@@ -55,16 +55,19 @@ void receivedCallback(uint32_t from, String &msg) {
   } else {
     fadeLedTo(tH, tS, tV, tMS);
   }
+  DEBUG_PRINTLN("ESP32 Free Heap: "+ESP.getFreeHeap());
 }
 
 void initMesh() {
-  // mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE );
-  mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | MSG_TYPES | REMOTE );
-  mesh.init("RFGLOW", "rfglow3939", 5555, WIFI_MODE_APSTA);
-  ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_AP, WIFI_PROTOCOL_11B));
-  ESP_ERROR_CHECK_WITHOUT_ABORT(esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11B));
-  ESP_ERROR_CHECK(esp_wifi_set_bandwidth(WIFI_IF_AP, WIFI_BW_HT20));
-  ESP_ERROR_CHECK_WITHOUT_ABORT(esp_wifi_set_bandwidth(WIFI_IF_STA, WIFI_BW_HT20));
+  TRACE();
+  mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE );
+  // mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | MSG_TYPES | REMOTE );
+  //mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | MSG_TYPES | REMOTE );
+  mesh.init("RFGLOW", "", 5555, WIFI_MODE_APSTA);
+  // ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_AP, WIFI_PROTOCOL_11B));
+  // ESP_ERROR_CHECK_WITHOUT_ABORT(esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11B));
+  // ESP_ERROR_CHECK(esp_wifi_set_bandwidth(WIFI_IF_AP, WIFI_BW_HT20));
+  // ESP_ERROR_CHECK_WITHOUT_ABORT(esp_wifi_set_bandwidth(WIFI_IF_STA, WIFI_BW_HT20));
 
 
   mesh.onReceive(&receivedCallback);
@@ -75,6 +78,7 @@ void reinitMeshAPOnly() {
     DEBUG_PRINTLN("Re-initialize mesh to AP only");
     mesh.stop();
     mesh.init("RFGLOW", "rfglow3939", 5555, WIFI_MODE_AP);
+    mesh.setRoot(true);
     isAPOnly = true;
     ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_AP, WIFI_PROTOCOL_11B));
     ESP_ERROR_CHECK(esp_wifi_set_bandwidth(WIFI_IF_AP, WIFI_BW_HT20));
@@ -89,7 +93,7 @@ void meshTick() {
     }
   } else {
     if (!isBleStarted()) {
-      startBLE();
+      //startBLE();
     }
   }
 }
