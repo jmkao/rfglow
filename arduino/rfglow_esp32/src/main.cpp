@@ -10,7 +10,7 @@ TaskHandle_t rfgTask;
 void setup() {
   delay(400);
   // ESP_ERROR_CHECK(esp_task_wdt_init(10, false));
-  //setCpuFrequencyMhz(160);
+  setCpuFrequencyMhz(80);
   
   #ifdef RFG_DEBUG
     Serial.begin(115200);

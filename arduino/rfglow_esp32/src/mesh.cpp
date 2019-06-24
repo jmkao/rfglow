@@ -7,12 +7,32 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 
+union switch_cmd_t {
+  struct color_t {
+    uint16_t h;
+    uint8_t s;
+    uint8_t v;
+  } color;
+
+  uint8_t bytes[sizeof(color_t)];
+};
+
+union fade_cmd_t {
+  struct color_t {
+    uint16_t h;
+    uint8_t s;
+    uint8_t v;
+    uint32_t fadeMs;
+  } color;
+
+  uint8_t bytes[sizeof(color_t)];
+};
+
+
 long lastMeshCmdMs = INT32_MIN;
 uint8_t broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 void receivedCallback(const uint8_t *mac_addr, const uint8_t *data, int len) {
-  unsigned int tH, tS, tV, tMS;
-
   char macStr[18];
   snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
            mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
@@ -21,18 +41,16 @@ void receivedCallback(const uint8_t *mac_addr, const uint8_t *data, int len) {
 
   lastMeshCmdMs = millis();
 
-  if (len == 4 || len == 6) {
-    tH = (data[0] << 8) + data[1];
-    tS = data[2];
-    tV = data[3];
-
-    if (len == 4) {
-      // DEBUG_PRINTLN("Mesh received data: "+data[0]+" "+data[1]+" "+data[2]+" "+data[3]);
-      switchLedTo(tH, tS, tV);
-    } else {
-      tMS = (data[4] << 8) | data[5];
-      fadeLedTo(tH, tS, tV, tMS);
-    }
+  if (len == sizeof(switch_cmd_t)) {
+    switch_cmd_t cmd;
+    memcpy(&cmd.bytes, data, len);
+    switchLedTo(cmd.color.h, cmd.color.s, cmd.color.v);
+  } else if (len == sizeof(fade_cmd_t)) {
+    fade_cmd_t cmd;
+    memcpy(&cmd.bytes, data, len);
+    fadeLedTo(cmd.color.h, cmd.color.s, cmd.color.v, cmd.color.fadeMs);
+  } else {
+    DEBUG_PRINTLN("Received byte count doesn't match any commands. Ignoring");
   }
 
   /*
@@ -119,33 +137,50 @@ void setCommandToMesh(target_color target) {
 
 void sendCommandToMesh(unsigned int tH, unsigned int tS, unsigned int tV, unsigned int tMS) {
 
-  uint8_t data[6];
-  size_t send_len = 6;
-  
-  data[0] = (uint8_t) ((tH >> 8) & 0x00FF);
-  data[1] = (uint8_t) (tH & 0x00FF);
-  data[2] = (uint8_t) tS;
-  data[3] = (uint8_t) tV;
-
   if (tMS == 0) {
-    data[4] = 0;
-    data[5] = 0;
-    send_len = 4;
+    switch_cmd_t cmd;
+    cmd.color.h = tH;
+    cmd.color.s = tS;
+    cmd.color.v = tV;
+
+    ESP_ERROR_CHECK_WITHOUT_ABORT(esp_now_send(broadcastMac, cmd.bytes, sizeof(switch_cmd_t)));
   } else {
-    data[4] = (uint8_t) ((tMS >> 8) & 0x00FF);
-    data[5] = (uint8_t) (tMS & 0x00FF);
+    fade_cmd_t cmd;
+    cmd.color.h = tH;
+    cmd.color.s = tS;
+    cmd.color.v = tV;
+    cmd.color.fadeMs = tMS;
+
+    ESP_ERROR_CHECK_WITHOUT_ABORT(esp_now_send(broadcastMac, cmd.bytes, sizeof(fade_cmd_t)));
   }
 
-  DEBUG_PRINTLN("Mesh sent data: "+data[0]+" "+data[1]+" "+data[2]+" "+data[3]);  
+  // uint8_t data[6];
+  // size_t send_len = 6;
+  
+  // data[0] = (uint8_t) ((tH >> 8) & 0x00FF);
+  // data[1] = (uint8_t) (tH & 0x00FF);
+  // data[2] = (uint8_t) tS;
+  // data[3] = (uint8_t) tV;
 
-/*
-  StaticJsonDocument<128> doc;
-  doc["h"] = tH;
-  doc["s"] = tS;
-  doc["v"] = tV;
-  doc["ms"] = tMS;
-  serializeJson(doc, payload);
-*/
+  // if (tMS == 0) {
+  //   data[4] = 0;
+  //   data[5] = 0;
+  //   send_len = 4;
+  // } else {
+  //   data[4] = (uint8_t) ((tMS >> 8) & 0x00FF);
+  //   data[5] = (uint8_t) (tMS & 0x00FF);
+  // }
+
+  // DEBUG_PRINTLN("Mesh sent data: "+data[0]+" "+data[1]+" "+data[2]+" "+data[3]);  
+
+
+  // StaticJsonDocument<128> doc;
+  // doc["h"] = tH;
+  // doc["s"] = tS;
+  // doc["v"] = tV;
+  // doc["ms"] = tMS;
+  // serializeJson(doc, payload);
+
 
   // String payload;
   // payload += tH;
@@ -155,6 +190,4 @@ void sendCommandToMesh(unsigned int tH, unsigned int tS, unsigned int tV, unsign
   // payload += tV;
   // payload += ",";
   // payload += tMS;
-
-  ESP_ERROR_CHECK_WITHOUT_ABORT(esp_now_send(broadcastMac, data, send_len));
 }
