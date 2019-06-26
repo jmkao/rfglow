@@ -13,7 +13,7 @@ void setup() {
   setCpuFrequencyMhz(80);
   
   #ifdef RFG_DEBUG
-    Serial.begin(115200);
+    Serial.begin(230400);
     DEBUG_PRINTLN("Startup esp32");
   #endif
 

@@ -7,22 +7,13 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 
-union switch_cmd_t {
-  struct color_t {
-    uint16_t h;
-    uint8_t s;
-    uint8_t v;
-  } color;
-
-  uint8_t bytes[sizeof(color_t)];
-};
-
 union fade_cmd_t {
-  struct color_t {
+  struct __attribute__((packed)) color_t {
     uint16_t h;
     uint8_t s;
     uint8_t v;
-    uint32_t fadeMs;
+    uint16_t fadeMs;
+    uint32_t seq;
   } color;
 
   uint8_t bytes[sizeof(color_t)];
@@ -31,6 +22,20 @@ union fade_cmd_t {
 
 long lastMeshCmdMs = INT32_MIN;
 uint8_t broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint32_t lastSeq = 0;
+QueueHandle_t meshQueue;
+
+
+void _espNowSendCmd(fade_cmd_t& cmd) {
+  uint32_t seq = cmd.color.seq;
+
+  cmd.color.h = htons(cmd.color.h);
+  cmd.color.fadeMs = htons(cmd.color.fadeMs);
+  cmd.color.seq = htonl(cmd.color.seq);
+
+  DEBUG_PRINTLN("Sending "+sizeof(fade_cmd_t)+" bytes with seq: "+seq);
+  ESP_ERROR_CHECK_WITHOUT_ABORT(esp_now_send(broadcastMac, cmd.bytes, sizeof(fade_cmd_t)));
+}
 
 void receivedCallback(const uint8_t *mac_addr, const uint8_t *data, int len) {
   char macStr[18];
@@ -41,49 +46,44 @@ void receivedCallback(const uint8_t *mac_addr, const uint8_t *data, int len) {
 
   lastMeshCmdMs = millis();
 
-  if (len == sizeof(switch_cmd_t)) {
-    switch_cmd_t cmd;
-    memcpy(&cmd.bytes, data, len);
-    switchLedTo(cmd.color.h, cmd.color.s, cmd.color.v);
-  } else if (len == sizeof(fade_cmd_t)) {
+  if (len == sizeof(fade_cmd_t)) {
     fade_cmd_t cmd;
-    memcpy(&cmd.bytes, data, len);
-    fadeLedTo(cmd.color.h, cmd.color.s, cmd.color.v, cmd.color.fadeMs);
+    memcpy(cmd.bytes, data, sizeof(fade_cmd_t));
+    cmd.color.h = ntohs(cmd.color.h);
+    cmd.color.fadeMs = ntohs(cmd.color.fadeMs);
+    cmd.color.seq = ntohl(cmd.color.seq);
+
+    DEBUG_PRINTLN("lastSeq = "+lastSeq+", received seq = "+cmd.color.seq);
+
+    if (cmd.color.seq == 0) {
+      // Command has no sequence, process but don't resend or update lastSeq
+    } else if (cmd.color.seq == 1 && lastSeq != 1) {
+      // Controller in the network was reset
+      DEBUG_PRINTLN("Received seq == 1, controller reset");
+      lastSeq = cmd.color.seq;
+    } else if (cmd.color.seq <= lastSeq) {
+      // We've already received this command
+      //DEBUG_PRINTLN("h = "+cmd.color.h+", s = "+cmd.color.s+", v="+cmd.color.v);
+      DEBUG_PRINTLN("seq <= lastSeq - Skipping.");
+      return;
+    } else {
+      lastSeq = cmd.color.seq;
+    }
+
+    xQueueSend(meshQueue, &cmd, 0);
   } else {
     DEBUG_PRINTLN("Received byte count doesn't match any commands. Ignoring");
   }
-
-  /*
-  StaticJsonDocument<128> doc;
-  deserializeJson(doc, msg);
-  tH = doc["h"];
-  tS = doc["s"];
-  tV = doc["v"];
-  tMS = doc["ms"];
-  */
-
-  // if (data[len-1] == 0) {
-  //   sscanf((char*)data, "%d,%d,%d,%d", &tH, &tS, &tV, &tMS);
-  // } else {
-  //   DEBUG_PRINTLN("Illegal data packet received - doesn't end in \0. Ignoring.");
-  //   return;
-  // }
-
-  // if (tMS == 0) {
-  //   switchLedTo(tH, tS, tV);
-  // } else {
-  //   fadeLedTo(tH, tS, tV, tMS);
-  // }
 
   DEBUG_PRINTLN("ESP32 Free Heap: "+ESP.getFreeHeap());
 }
 
 void sentCallback(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  char macStr[18];
-  snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
-           mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-  DEBUG_PRINTLN("Sent packet to: "+macStr);
-  DEBUG_PRINTLN("Send Status: "+(status == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail"));
+  // char macStr[18];
+  // snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
+  //          mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+  // DEBUG_PRINTLN("Sent packet to: "+macStr);
+  //DEBUG_PRINTLN("Send Status: "+(status == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail"));
 }
 
 void initMesh() {
@@ -110,9 +110,26 @@ void initMesh() {
   peer.encrypt = false;
   memcpy(peer.peer_addr, broadcastMac, ESP_NOW_ETH_ALEN);
   ESP_ERROR_CHECK_WITHOUT_ABORT(esp_now_add_peer(&peer));
+
+  meshQueue = xQueueCreate(5, sizeof(fade_cmd_t));
 }
 
 void meshTick() {
+  fade_cmd_t cmd;
+  if (xQueueReceive(meshQueue, &cmd, 0)) {
+    if (cmd.color.fadeMs == 0) {
+      switchLedTo(cmd.color.h, cmd.color.s, cmd.color.v);
+    } else {
+      fadeLedTo(cmd.color.h, cmd.color.s, cmd.color.v, cmd.color.fadeMs);
+    }
+
+    // Rebroadcast command if we processed it
+    if (lastSeq == cmd.color.seq && cmd.color.seq != 0) {
+      _espNowSendCmd(cmd);
+    }
+
+  }
+
   if (isMeshMasterPresent()) {
     if (!isBleConnected() && isBleStarted()) {
       stopBLE();
@@ -131,63 +148,23 @@ boolean isMeshMasterPresent() {
   return false;
 }
 
-void setCommandToMesh(target_color target) {
-  sendCommandToMesh(target.h, target.s, target.v, target.ms);
+void setCommandToMesh(target_color target, bool useSeq) {
+  sendCommandToMesh(target.h, target.s, target.v, target.ms, useSeq);
 }
 
-void sendCommandToMesh(unsigned int tH, unsigned int tS, unsigned int tV, unsigned int tMS) {
+void sendCommandToMesh(unsigned int tH, unsigned int tS, unsigned int tV, unsigned int tMS, bool useSeq) {
 
-  if (tMS == 0) {
-    switch_cmd_t cmd;
-    cmd.color.h = tH;
-    cmd.color.s = tS;
-    cmd.color.v = tV;
-
-    ESP_ERROR_CHECK_WITHOUT_ABORT(esp_now_send(broadcastMac, cmd.bytes, sizeof(switch_cmd_t)));
-  } else {
-    fade_cmd_t cmd;
-    cmd.color.h = tH;
-    cmd.color.s = tS;
-    cmd.color.v = tV;
-    cmd.color.fadeMs = tMS;
-
-    ESP_ERROR_CHECK_WITHOUT_ABORT(esp_now_send(broadcastMac, cmd.bytes, sizeof(fade_cmd_t)));
+  uint32_t seq = 0;
+  if (useSeq) {
+    seq = ++lastSeq;
   }
 
-  // uint8_t data[6];
-  // size_t send_len = 6;
-  
-  // data[0] = (uint8_t) ((tH >> 8) & 0x00FF);
-  // data[1] = (uint8_t) (tH & 0x00FF);
-  // data[2] = (uint8_t) tS;
-  // data[3] = (uint8_t) tV;
+  fade_cmd_t cmd;
+  cmd.color.h = tH;
+  cmd.color.s = tS;
+  cmd.color.v = tV;
+  cmd.color.fadeMs = tMS;
+  cmd.color.seq = seq;
 
-  // if (tMS == 0) {
-  //   data[4] = 0;
-  //   data[5] = 0;
-  //   send_len = 4;
-  // } else {
-  //   data[4] = (uint8_t) ((tMS >> 8) & 0x00FF);
-  //   data[5] = (uint8_t) (tMS & 0x00FF);
-  // }
-
-  // DEBUG_PRINTLN("Mesh sent data: "+data[0]+" "+data[1]+" "+data[2]+" "+data[3]);  
-
-
-  // StaticJsonDocument<128> doc;
-  // doc["h"] = tH;
-  // doc["s"] = tS;
-  // doc["v"] = tV;
-  // doc["ms"] = tMS;
-  // serializeJson(doc, payload);
-
-
-  // String payload;
-  // payload += tH;
-  // payload += ",";
-  // payload += tS;
-  // payload += ",";
-  // payload += tV;
-  // payload += ",";
-  // payload += tMS;
+  _espNowSendCmd(cmd);
 }

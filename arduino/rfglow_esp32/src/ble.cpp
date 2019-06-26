@@ -23,13 +23,13 @@ static class : public BLECharacteristicCallbacks {
         unsigned int target_brightness = data[3];
 
         if (len == 4) {
-          sendCommandToMesh(target_hue, target_saturation, target_brightness, 0);
+          sendCommandToMesh(target_hue, target_saturation, target_brightness, 0, true);
           switchLedTo(target_hue, target_saturation, target_brightness);
           return;
         }
 
         unsigned int target_fade_ms = (data[4] << 8) | data[5];
-        sendCommandToMesh(target_hue, target_saturation, target_brightness, target_fade_ms);
+        sendCommandToMesh(target_hue, target_saturation, target_brightness, target_fade_ms, true);
         fadeLedTo(target_hue, target_saturation, target_brightness, target_fade_ms);
       } else {
         DEBUG_PRINTLN("Invalid BLE command length, ignoring.");
