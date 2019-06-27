@@ -7,13 +7,12 @@
 void initLEDs();
 void ledTick();
 
-void incrementHue();
 void toggleAutocycle();
 void stopAutocycle();
-void incrementBrightness();
 
 void setupFlashLED();
 
+void changeTarget(target_color target);
 void fadeLedTo(unsigned int h, unsigned int s, unsigned int v, unsigned int ms);
 void switchLedTo(unsigned int h, unsigned int s, unsigned int v);
 

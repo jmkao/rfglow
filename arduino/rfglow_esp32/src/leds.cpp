@@ -80,21 +80,12 @@ void ledTick() {
   prevMs = curMs;
 }
 
-void incrementHue() {
-  isAutoCycle = false;
-  target.h = (target.h + 60) % 360;
-}
-
 void toggleAutocycle() {
   isAutoCycle = !isAutoCycle;
 }
 
 void stopAutocycle() {
   isAutoCycle = false;
-}
-
-void incrementBrightness() {
-  target.v = (target.v + 60) % 240;
 }
 
 void setupFlashLED() {
@@ -109,6 +100,14 @@ void setupFlashLED() {
   driver->set_milliamps(ma);
 
   // driver->enable_outputs(false);  
+}
+
+void changeTarget(target_color target) {
+  if (target.ms == 0) {
+    switchLedTo(target.h, target.s, target.v);
+  } else {
+    fadeLedTo(target.h, target.s, target.v, target.ms);
+  }
 }
 
 void switchLedTo(unsigned int h, unsigned int s, unsigned int v) {

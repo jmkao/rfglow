@@ -148,7 +148,7 @@ boolean isMeshMasterPresent() {
   return false;
 }
 
-void setCommandToMesh(target_color target, bool useSeq) {
+void sendCommandToMesh(target_color target, bool useSeq) {
   sendCommandToMesh(target.h, target.s, target.v, target.ms, useSeq);
 }
 
