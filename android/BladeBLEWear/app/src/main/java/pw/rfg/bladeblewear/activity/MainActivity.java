@@ -2,10 +2,10 @@ package pw.rfg.bladeblewear.activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -89,14 +89,14 @@ public class MainActivity extends WearableActivity {
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
 
-        binding.mainMenu.setVisibility(View.INVISIBLE);
+        //binding.mainMenu.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void onExitAmbient() {
         super.onExitAmbient();
 
-        binding.mainMenu.setVisibility(View.VISIBLE);
+        //binding.mainMenu.setVisibility(View.VISIBLE);
     }
 
     @Override

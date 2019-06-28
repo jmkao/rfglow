@@ -1,10 +1,21 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/home/jkao/.android/debug.keystore')
+        }
+        release {
+            storeFile file('/home/jkao/.android/keys/jmk-symbol.jks')
+            storePassword 'password'
+            keyAlias = 'key0'
+            keyPassword 'password'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "pw.rfg.bladeblewear"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -13,6 +24,9 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
+            useProguard true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -21,16 +35,17 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.android.support:wearable:2.3.0'
+    implementation 'com.google.android.support:wearable:2.4.0'
     //implementation 'com.google.android.gms:play-services-wearable:15.0.1'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
-    implementation 'com.google.firebase:firebase-firestore:17.0.2'
-    implementation 'com.android.support:percent:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-firestore:20.1.0'
+    implementation 'androidx.percentlayout:percentlayout:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     //implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:wear:27.1.1'
-    compileOnly 'com.google.android.wearable:wearable:2.3.0'
-    implementation 'com.android.support:design:27.1.1'
+    implementation 'androidx.wear:wear:1.0.0'
+    compileOnly 'com.google.android.wearable:wearable:2.4.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    //implementation 'org.mozilla.components:lib-jexl:1.0.0'
     implementation 'org.apache.commons:commons-jexl3:3.1'
     //implementation 'no.nordicsemi.android:ble:1.1.0'
     //implementation 'com.android.support:multidex:1.0.3'

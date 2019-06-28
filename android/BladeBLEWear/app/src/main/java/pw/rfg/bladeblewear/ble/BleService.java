@@ -19,16 +19,12 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.ParcelUuid;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class BleService extends Service {
     private static final String TAG = "BleService";

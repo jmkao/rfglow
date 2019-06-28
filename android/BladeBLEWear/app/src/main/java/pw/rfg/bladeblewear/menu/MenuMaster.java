@@ -1,6 +1,6 @@
 package pw.rfg.bladeblewear.menu;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.firestore.DocumentChange;
@@ -43,7 +43,6 @@ public class MenuMaster {
         this.db = FirebaseFirestore.getInstance();
 
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
                 .setPersistenceEnabled(true)
                 .build();
 

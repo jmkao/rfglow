@@ -9,11 +9,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class BleMaster {
     private static final String TAG = "BleMaster";
