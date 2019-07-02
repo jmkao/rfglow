@@ -268,18 +268,27 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int maLevel) {
   setRGBRaw(r, g, b);
 }
 
+void disableOutputs() {
+  driver->pattern(0x0000);
+  // driver->set_milliamps(120); // Doesn't have any effect on leakage
+  driver->enable_outputs(false);
+}
+
+void enableOutputs() {
+  driver->set_milliamps(ma);
+  driver->enable_outputs(true);
+}
 
 void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
   
   if (r==0 && g==0 && b==0) {
-    driver->pattern(0x0000);
     if (driver->is_enabled()) {
-      driver->enable_outputs(false);
+      disableOutputs();
     }
   } else {
     //DEBUG_PRINTLN("setRGBRaw() called: "+r+" "+g+" "+b);
     if (!driver->is_enabled()) {
-      driver->enable_outputs(true);
+      enableOutputs();
     }
     
     byte leds[16];
@@ -300,5 +309,20 @@ void setRGBRaw(unsigned char r, unsigned char g, unsigned char b) {
     }
     
     driver->set_outputs(leds);
+  }
+}
+
+void vbatLEDOn() {
+   // Check battery voltage and show as color during init delays
+  float vBat = vbatRead();
+  DEBUG_PRINTLN("vBAT = "+vBat);
+  if (vBat > 3.8) {
+    setRGBRaw(0,0,20);
+  } else if (vBat > 3.5) {
+    setRGBRaw(0,20,5);
+  } else if (vBat > 3.25) {
+    setRGBRaw(16, 15, 0);
+  } else {
+    setRGBRaw(20, 0, 0);
   }
 }

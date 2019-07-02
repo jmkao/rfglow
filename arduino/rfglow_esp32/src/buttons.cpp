@@ -46,6 +46,10 @@ void clickAction() {
 
 void doubleClickAction() {
   DEBUG_PRINTLN("Double click");
+  target_color orig = getCurrentTarget();
+  vbatLEDOn();
+  delay(1000);
+  changeTarget(orig);
 }
 
 void longPressAction() {

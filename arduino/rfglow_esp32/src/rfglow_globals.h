@@ -13,7 +13,7 @@
 // Interval between mesh commands to keep BLE off
 #define WIFI_BLE_STOP_INTERVAL 5000
 
-#define WIFI_CHANNEL 11
+#define WIFI_CHANNEL 8
 
 /*** Development Macros ***/
 // Uncomment to enable debug logging
@@ -47,3 +47,6 @@ struct target_color {
 extern bool adcDone;
 
 extern unsigned long lastCmdMs;
+
+/*** Global Functions ***/
+float vbatRead();
