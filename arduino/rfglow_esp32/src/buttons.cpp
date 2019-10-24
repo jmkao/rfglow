@@ -32,7 +32,7 @@ uint8_t currentSetIndex = 0;
 void initButtons() {
   // Init OneButton
   button.attachClick(clickAction);
-  button.attachDoubleClick(doubleClickAction);
+  //button.attachDoubleClick(doubleClickAction);
   button.attachLongPressStart(longPressAction);
   button.setClickTicks(150);
 }

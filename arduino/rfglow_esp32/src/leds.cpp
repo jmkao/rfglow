@@ -316,11 +316,11 @@ void vbatLEDOn() {
    // Check battery voltage and show as color during init delays
   float vBat = vbatRead();
   DEBUG_PRINTLN("vBAT = "+vBat);
-  if (vBat > 3.8) {
+  if (vBat > 3.93) {
     setRGBRaw(0,0,20);
-  } else if (vBat > 3.5) {
+  } else if (vBat > 3.7) {
     setRGBRaw(0,20,5);
-  } else if (vBat > 3.25) {
+  } else if (vBat > 3.42) {
     setRGBRaw(16, 15, 0);
   } else {
     setRGBRaw(20, 0, 0);

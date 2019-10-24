@@ -15,5 +15,9 @@ float vbatRead() {
 
   DEBUG_PRINTLN("Raw VBAT_ADC_PIN ADC read: "+raw);
 
-  return (((float)raw)/20.0*3300.0/2047.0+178.0)*2.095/1000.0;
+  float vBat = 0.0;
+
+  vBat = (float)raw / 20.0 / 4096.0 * 2.0 * 7.451;
+
+  return vBat;
 }

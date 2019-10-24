@@ -4,4 +4,3 @@
 
 void setup();
 void loop();
-float vbatRead();
