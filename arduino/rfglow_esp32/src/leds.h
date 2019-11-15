@@ -21,5 +21,6 @@ void setHSVRaw(unsigned int h, unsigned int s, unsigned int v, int maLevel);
 void setRGBRaw(unsigned char r, unsigned char g, unsigned char b);
 
 target_color getCurrentTarget();
+target_color getCurrentCmdColor();
 
 void vbatLEDOn();

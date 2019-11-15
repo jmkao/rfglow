@@ -17,10 +17,10 @@ void rfgLoopTask(void* pvParams) {
     ledTick();
     meshTick();
 
-    unsigned long ms = millis();
-    if (ms % 1000 == 0) {
-      DEBUG_PRINTLN("vBAT = "+vbatRead());
-    }
+    // unsigned long ms = millis();
+    // if (ms % 1000 == 0) {
+    //   DEBUG_PRINTLN("vBAT = "+vbatRead());
+    // }
     delay(1);
   }
 }

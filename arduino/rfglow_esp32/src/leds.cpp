@@ -166,6 +166,13 @@ target_color getCurrentTarget() {
   }
 }
 
+target_color getCurrentCmdColor() {
+  target_color currentCmdColor = getCurrentTarget();
+  currentCmdColor.h += target_maLevel*360;
+
+  return currentCmdColor;
+}
+
 /*
 void setHSV(unsigned int h, unsigned int s, unsigned int v) {
   DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
