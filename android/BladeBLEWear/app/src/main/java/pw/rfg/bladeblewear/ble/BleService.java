@@ -22,9 +22,11 @@ import android.os.ParcelUuid;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class BleService extends Service {
     private static final String TAG = "BleService";
@@ -33,14 +35,15 @@ public class BleService extends Service {
     private static final ParcelUuid TX_UUID = ParcelUuid.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
     private static final ParcelUuid SERVICE_UUID = ParcelUuid.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
 
-    private static final boolean GATT_AUTOCONNECT = true;
+    private static final boolean GATT_AUTOCONNECT = false;
 
     private static final ScanSettings scanSettings =
             new ScanSettings.Builder()
-                    .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
                     .setMatchMode(ScanSettings.MATCH_MODE_STICKY)
                     //.setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH)
                     .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+                    //.setReportDelay(250)
                     .build();
 
     private static final ScanFilter scanFilter = new ScanFilter.Builder()
@@ -78,6 +81,7 @@ public class BleService extends Service {
             if (!DEVICE_NAME.equals(device.getName())) {
                 return;
             }
+
             updateBleStatus("Device found");
             if (bleScanner != null) {
                 Log.d(TAG, "onScanResult() Stopping BLE Scan");
