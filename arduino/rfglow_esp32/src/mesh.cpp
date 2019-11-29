@@ -20,10 +20,12 @@ union fade_cmd_t {
 };
 
 
-long lastMeshCmdMs = INT32_MIN;
+int32_t lastMeshCmdMs = INT32_MIN;
+uint32_t lastSentCmdMs = 0;
 uint8_t broadcastMac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint32_t lastSeq = 0;
 QueueHandle_t meshQueue;
+boolean isInControl = false;
 
 
 void _espNowSendCmd(fade_cmd_t& cmd) {
@@ -118,18 +120,29 @@ void initMesh() {
 void meshTick() {
   fade_cmd_t cmd;
   if (xQueueReceive(meshQueue, &cmd, 0)) {
+    isInControl = false;
+
     if (cmd.color.fadeMs == 0) {
       switchLedTo(cmd.color.h, cmd.color.s, cmd.color.v);
     } else {
       fadeLedTo(cmd.color.h, cmd.color.s, cmd.color.v, cmd.color.fadeMs);
     }
 
-    // Rebroadcast command if we processed it
+    // Rebroadcast command if we reacted to it
     if (lastSeq == cmd.color.seq && cmd.color.seq != 0) {
       _espNowSendCmd(cmd);
     }
 
   }
+
+  // If I was the last stick to initiate a command that was not a repeater resent
+  // and if more than 1 second has passsed since I last sent a command
+  // and I am not in the middle of a fade
+  // then send my current color to the mesh as if it were a new command (e.g. incrementing seq and triggering repeater resends)
+  target_color currentTarget = getCurrentCmdColor();
+  if (isInControl == true && millis() - lastSentCmdMs > MESH_RESEND_INTERVAL_MS && currentTarget.ms == 0) {
+    sendCommandToMesh(currentTarget, false);
+  };
 
   if (isMeshMasterPresent()) {
     if (!isBleConnected() && isBleStarted()) {
@@ -154,6 +167,10 @@ void sendCommandToMesh(target_color target, bool useSeq) {
 }
 
 void sendCommandToMesh(unsigned int tH, unsigned int tS, unsigned int tV, unsigned int tMS, bool useSeq) {
+  isInControl = true;
+  lastSentCmdMs = millis();
+
+  DEBUG_PRINTLN("sendCommandToMesh() called: "+tH+" "+tS+" "+tV);
 
   uint32_t seq = 0;
   if (useSeq) {

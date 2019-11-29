@@ -15,6 +15,8 @@
 
 #define WIFI_CHANNEL 8
 
+#define MESH_RESEND_INTERVAL_MS 2500
+
 /*** Development Macros ***/
 // Uncomment to enable debug logging
 #define RFG_DEBUG

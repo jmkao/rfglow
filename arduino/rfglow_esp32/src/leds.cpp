@@ -166,6 +166,13 @@ target_color getCurrentTarget() {
   }
 }
 
+target_color getCurrentCmdColor() {
+  target_color currentCmdColor = getCurrentTarget();
+  currentCmdColor.h += target_maLevel*360;
+
+  return currentCmdColor;
+}
+
 /*
 void setHSV(unsigned int h, unsigned int s, unsigned int v) {
   DEBUG_PRINTLN("setHSV() called: "+h+" "+s+" "+v);
@@ -316,11 +323,11 @@ void vbatLEDOn() {
    // Check battery voltage and show as color during init delays
   float vBat = vbatRead();
   DEBUG_PRINTLN("vBAT = "+vBat);
-  if (vBat > 3.8) {
+  if (vBat > 3.93) {
     setRGBRaw(0,0,20);
-  } else if (vBat > 3.5) {
+  } else if (vBat > 3.7) {
     setRGBRaw(0,20,5);
-  } else if (vBat > 3.25) {
+  } else if (vBat > 3.42) {
     setRGBRaw(16, 15, 0);
   } else {
     setRGBRaw(20, 0, 0);
