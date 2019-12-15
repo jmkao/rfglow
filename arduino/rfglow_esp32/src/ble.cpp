@@ -5,6 +5,7 @@
 BLEServer *pServer = NULL;
 BLEService *pService = NULL;
 BLEAdvertising *pAdvertising  = NULL;
+BLEAdvertisementData advertisingData;
 
 boolean isConnected = false;
 boolean isStarted = false;
@@ -74,6 +75,12 @@ void initBLE() {
   pService->start();
 
   pAdvertising = pServer->getAdvertising();
+
+  advertisingData.setName("RFGLOW");
+  advertisingData.setManufacturerData("99");
+  pAdvertising->setAdvertisementData(advertisingData);
+  pAdvertising->setScanResponseData(advertisingData);
+
   pAdvertising->start();
 
   isStarted = true;
