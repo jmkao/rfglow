@@ -76,10 +76,10 @@ void initBLE() {
 
   pAdvertising = pServer->getAdvertising();
 
-  advertisingData.setName("RFGLOW");
-  advertisingData.setManufacturerData("99");
-  pAdvertising->setAdvertisementData(advertisingData);
-  pAdvertising->setScanResponseData(advertisingData);
+  // advertisingData.setName("RFGLOW");
+  // advertisingData.setManufacturerData("99");
+  // pAdvertising->setAdvertisementData(advertisingData);
+  // pAdvertising->setScanResponseData(advertisingData);
 
   pAdvertising->start();
 

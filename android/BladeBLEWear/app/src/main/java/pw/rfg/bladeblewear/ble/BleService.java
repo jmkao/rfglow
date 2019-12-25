@@ -82,14 +82,14 @@ public class BleService extends Service {
                 return;
             }
 
-            SparseArray<byte[]> manufacturerData = result.getScanRecord().getManufacturerSpecificData();
-            Log.d(TAG, "Manufacturer Data Size: "+manufacturerData.size());
-            for(int i = 0; i < manufacturerData.size(); i++){
-                int id = manufacturerData.keyAt(i);
-                byte[] datum = manufacturerData.get(id);
-                Log.d(TAG, "ID: "+id);
-                Log.d(TAG, "Datum: "+Arrays.toString(datum));
-            }
+//            SparseArray<byte[]> manufacturerData = result.getScanRecord().getManufacturerSpecificData();
+//            Log.d(TAG, "Manufacturer Data Size: "+manufacturerData.size());
+//            for(int i = 0; i < manufacturerData.size(); i++){
+//                int id = manufacturerData.keyAt(i);
+//                byte[] datum = manufacturerData.get(id);
+//                Log.d(TAG, "ID: "+id);
+//                Log.d(TAG, "Datum: "+Arrays.toString(datum));
+//            }
 
             updateBleStatus("Device found");
             if (bleScanner != null) {
